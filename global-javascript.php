@@ -1,12 +1,13 @@
 <?php
 /*
 Plugin Name: Global Javascript
-Plugin URI: 
+Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.5
-Author: Julien Law
-Author URI:
-Based on the Improved Simpler CSS plugin by CTLT
+Version: 1.0
+Author: Julien Law, CTLT
+Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
+Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
+and then Frederick Ding http://simplerplugins.wordpress.com
 */
 
 /*  Copyright 2013  Julien Law
@@ -264,20 +265,26 @@ If you are familiar with Javascript, you may delete these comments and get start
 
 alert("Hello");
 
-That line will display a popup message box that says Hello
+That line will display a popup message box that says "Hello" without the quotes.
 
 Javascript is not very hard to learn. There are many free references to help you get started, like http://www.w3schools.com/js/default.asp
 
 We hope you enjoy developing your custom JS. Here are a few things to keep in mind:
- - You cannot edit the stylesheets of your theme. Your stylesheet will be loaded after the theme stylesheets, which means that your rules can take precedence and override the theme CSS rules.
- - CSS comments will be stripped from your stylesheet when outputted. */
+ - You cannot edit the Javascript of your themes and other plugins. The Javascript you create will be loaded after all the other Javascript is loaded.
+ - Anything inside Javascript comments will not be outputted */
 
-/* This is a comment.*/
+/* This 
+   is 
+   a 
+   comment
+   block.
+*/
+	
+// This is a single line comment
 
 /*
 Things we strip out include:
  * HTML code
- * @import rules
  * comments (upon output)
 
 Things we encourage include:
