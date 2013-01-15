@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: 
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.2
+Version: 0.5
 Author: Julien Law
 Author URI:
 Based on the Improved Simpler CSS plugin by CTLT
