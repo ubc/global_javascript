@@ -5,6 +5,8 @@ Allows the user to create custom javascript for their Wordpress powered site on 
 
 === changelog ===
 
+v0.4 codemirror javascript mode code should have more meaning now
+
 v0.3 beautified the codemirror javascript mode code
 
 v0.2 changed code to edit javascript instead of css
