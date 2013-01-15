@@ -5,10 +5,13 @@ Allows the user to create custom javascript for their Wordpress powered site on 
 
 === changelog ===
 
-v0.4 codemirror javascript mode code should have more meaning now
+v0.5 -  added stylesheets to the editor
+     -  changed the names of some style class tags inside codemirror.js 
 
-v0.3 beautified the codemirror javascript mode code
+v0.4 -  codemirror javascript mode code should have more meaning now
 
-v0.2 changed code to edit javascript instead of css
+v0.3 -  beautified the codemirror javascript mode code
 
-v0.1 core code created from the improved simpler css plugin by CTLT
+v0.2 -  changed code to edit javascript instead of css
+
+v0.1 -  core code created from the improved simpler css plugin by CTLT
