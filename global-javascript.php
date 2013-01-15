@@ -1,15 +1,15 @@
 <?php
 /*
-Plugin Name: Improved Simpler CSS
+Plugin Name: Global Javascript
 Plugin URI: 
-Description: Simplifies custom CSS on WordPress.
-Version: 1.01
-Author: CTLT Dev
-Author URI: http://ctlt.ubc.ca
-Forked from Jeremiah Orem's Custom User CSS plugin and then Frederick Ding http://simplerplugins.wordpress.com/
+Description: Allows the creation and editing of Javascript on Wordpress powered sites
+Version: 0.1
+Author: Julien Law
+Author URI:
+Based on the Improved Simpler CSS plugin by CTLT
 */
 
-/*  Copyright 2011  Enej 
+/*  Copyright 2013  Julien Law
 
     This program is free software; you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
