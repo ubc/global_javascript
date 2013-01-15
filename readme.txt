@@ -5,6 +5,8 @@ Allows the user to create custom javascript for their Wordpress powered site on 
 
 === changelog ===
 
+v1.0 -  updated default text and info for global-javascript.php to prepare for release verison
+
 v0.5 -  added stylesheets to the editor
      -  changed the names of some style class tags inside codemirror.js 
 
