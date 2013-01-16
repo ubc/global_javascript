@@ -25,7 +25,7 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
-v1.0 -  updated default text and info for global-javascript.php to prepare for release verison
+v0.6 -  updated default text and info for global-javascript.php
 
 v0.5 -  added stylesheets to the editor
      -  changed the names of some style class tags inside codemirror.js 
