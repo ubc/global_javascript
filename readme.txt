@@ -25,6 +25,8 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.6.1 - fixed some typos
+
 v0.6 -  updated default text and info for global-javascript.php
 
 v0.5 -  added stylesheets to the editor

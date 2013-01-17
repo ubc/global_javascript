@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.6
+Version: 0.6.1
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -138,12 +138,12 @@ function global_javascript_init(){
  * global_javascript_save_revision function.
  * safe the revisoin 
  * @access public
- * @param mixed $css
+ * @param mixed $js
  * @return void
  */
 function global_javascript_save_revision( $js ) {
 
-	// If null, there was no original safecss record, so create one
+	// If null, there was no original safejs record, so create one
 	if ( !$safejs_post = global_javascript_get_js() ) {
 		$post = array();
 		$post['post_content'] = $js;
@@ -184,7 +184,7 @@ function global_javascript_save_revision( $js ) {
 		endif;
 		
 		return true;
-	} // there is a styles store in the custom post type
+	} // there is a javascript store in the custom post type
 	
 	$safejs_post['post_content'] = $js;
 	
@@ -361,75 +361,27 @@ Things we encourage include:
 	</form>
 	</div>
 
-<?php if($_GET['code'] !="none"): 
-	wp_enqueue_script('global-javascript-loading', plugins_url('/js/global-javascript-loading.js', __FILE__));
-/*?>
-<script>
-	var js_change = 0;
-	var editor = CodeMirror.fromTextArea(document.getElementById("global_js_js"), {
-		mode: "text/javascript", lineNumbers: true, indentUnit:2,
-		onChange: function(){
-			js_change++;
-			if(js_change > 1)
-			{
-			 jQuery("#unsaved_changes").show();
-			
-			}
-		
+<?php 
+	if($_GET['code'] !="none"): 
+		wp_enqueue_script('global-javascript-loading', plugins_url('/js/global-javascript-loading.js', __FILE__));
+	endif; 
+
+	$safejs_post = global_javascript_get_js();
+
+	if ( 0 < $safejs_post['ID'] && wp_get_post_revisions( $safejs_post['ID'] ) ) {
+		function post_revisions_meta_box( $safejs_post ) {
+			// Specify numberposts and ordering args
+			$args = array( 'numberposts' => 5, 'orderby' => 'ID', 'order' => 'DESC' );
+			// Remove numberposts from args if show_all_rev is specified
+			if ( isset( $_GET['show_all_rev'] ) )
+				unset( $args['numberposts'] );
+	
+			wp_list_post_revisions( $safejs_post['ID'], $args );
 		}
-	    });
-	var lastPos = null, lastQuery = null, marked = [];	
-	function unmark() {
-	  for (var i = 0; i < marked.length; ++i) marked[i]();
-	  marked.length = 0;
-	}
-	
-	function search() {
-	  unmark();                     
-	  var text = document.getElementById("query").value;
-	  if (!text) return;
-	  for (var cursor = editor.getSearchCursor(text); cursor.findNext();)
-	    marked.push(editor.markText(cursor.from(), cursor.to(), "searched"));
-	
-	  if (lastQuery != text) lastPos = null;
-	  var cursor = editor.getSearchCursor(text, lastPos || editor.getCursor());
-	  if (!cursor.findNext()) {
-	    cursor = editor.getSearchCursor(text);
-	    if (!cursor.findNext()) return;
-	  }
-	  editor.setSelection(cursor.from(), cursor.to());
-	  lastQuery = text; lastPos = cursor.to();
-	}
-	
-	function replace1() {
-	  unmark();
-	  var text = document.getElementById("query").value,
-	      replace = document.getElementById("replace").value;
-	  if (!text) return;
-	  for (var cursor = editor.getSearchCursor(text); cursor.findNext();)
-	    editor.replaceRange(replace, cursor.from(), cursor.to());
-	}
 
-</script>
-
-<?php */endif; 
-
-$safejs_post = global_javascript_get_js();
-
-if ( 0 < $safejs_post['ID'] && wp_get_post_revisions( $safejs_post['ID'] ) ) {
-	function post_revisions_meta_box( $safejs_post ) {
-		// Specify numberposts and ordering args
-		$args = array( 'numberposts' => 5, 'orderby' => 'ID', 'order' => 'DESC' );
-		// Remove numberposts from args if show_all_rev is specified
-		if ( isset( $_GET['show_all_rev'] ) )
-			unset( $args['numberposts'] );
-
-		wp_list_post_revisions( $safejs_post['ID'], $args );
-	}
-
-	add_meta_box( 'revisionsdiv', __( 'JS Revisions', 'safejs' ), 'post_revisions_meta_box', 's-custom-js', 'normal' );
+		add_meta_box( 'revisionsdiv', __( 'JS Revisions', 'safejs' ), 'post_revisions_meta_box', 's-custom-js', 'normal' );
 	do_meta_boxes( 's-custom-js', 'normal', $safejs_post );
-}
+	}
 ?>
 </div></div>
 <?php 
