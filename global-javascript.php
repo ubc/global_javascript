@@ -361,7 +361,9 @@ Things we encourage include:
 	</form>
 	</div>
 
-<?php if($_GET['code'] !="none"): ?>
+<?php if($_GET['code'] !="none"): 
+	wp_enqueue_script('global-javascript-loading', plugins_url('/js/global-javascript-loading.js', __FILE__));
+/*?>
 <script>
 	var js_change = 0;
 	var editor = CodeMirror.fromTextArea(document.getElementById("global_js_js"), {
@@ -410,7 +412,7 @@ Things we encourage include:
 
 </script>
 
-<?php endif; 
+<?php */endif; 
 
 $safejs_post = global_javascript_get_js();
 
