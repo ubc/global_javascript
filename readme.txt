@@ -25,6 +25,11 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.8 - changed the way javascript is injected to the page 
+        * javascript is now injected from an external file
+     - javascript is now saved to an external javascript file as well
+     - current handling of saving needs to be updated; may be security issues
+
 v0.7 - changed the code to a class instead
 
 v0.6.1 - fixed some typos
