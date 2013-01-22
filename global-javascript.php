@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.7
+Version: 0.8
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -193,8 +193,38 @@ class GlobalJavascript {
 		$safejs_post['post_content'] = $js;
 		
 		wp_update_post( $safejs_post );
+		$this->save_to_external_file( $js );
 		return true;
 	}
+	
+	/**
+	 * save_to_external_file function
+	 * This function will be called to save the javascript to an external .js file
+	 * @access private
+	 * @return void
+	 */
+	private function save_to_external_file( $js_to_save ) {
+		$file = WP_PLUGIN_DIR."/global-javascript/js/global-javascript-actual.js";
+		
+		if( is_writable( $file ) ) {
+			if( !$handle = fopen( $file, 'w' ) ) {
+				echo "Cannot open file...";
+				exit;
+			}
+			if( fwrite( $handle, $js_to_save ) === FALSE ) {
+				echo "Cannot write to file...";
+				exit;
+			}
+			
+			echo "Success, wrote to file!";
+			
+			fclose( $handle );
+		}
+		else {
+			echo "The file $file is not writable";
+		}
+	}
+	
 	/**
 	 * gj_get_js function.
 	 * Get the custom js from posts table 
@@ -244,10 +274,13 @@ class GlobalJavascript {
 		$global_js_js = get_option ( 'global_js_js' );
 		if(!is_array($global_js_js))
 			$global_js_js = array( $global_js_js );
+		
+		echo '<script type="text/javascript" src="' . plugins_url( 'global-javascript/js/global-javascript-actual.js' ) . '">' . '</script>' . "\n";
+		//echo '</script>' . "\n";
 			
-		echo '<script type="text/javascript">' . "\n";
+		/*echo '<script type="text/javascript">' . "\n";
 		echo $this->gj_filter( $this->always_get_js() ) . "\n";
-		echo '</script>' . "\n";
+		echo '</script>' . "\n";*/
 	}
 	
 	public function gj_filter( $_content ) {
@@ -389,7 +422,6 @@ Things we encourage include:
 	</div></div>
 	<?php 
 	}
-	
 
 }
 
