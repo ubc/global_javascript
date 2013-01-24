@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.8
+Version: 0.9
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -26,6 +26,10 @@ and then Frederick Ding http://simplerplugins.wordpress.com
 	along with this program; if not, write to the Free Software
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
+
+/** Constants **/
+define( 'GLOBAL_JAVASCRIPT_PATH', plugin_basename( dirname( __FILE__ ) ) );
+
 class GlobalJavascript {
 	/***************
 	 * Constructor *
@@ -54,7 +58,7 @@ class GlobalJavascript {
 	 * @return void
 	 */
 	public function register_admin_styles() {
-		wp_enqueue_style( 'global-javascript-admin-styles', plugins_url( '/global-javascript/css/styles.css' ) );
+		wp_enqueue_style( 'global-javascript-admin-styles', plugins_url(GLOBAL_JAVASCRIPT_PATH . '/css/styles.css') );
 	}
 	
 	/**
@@ -73,7 +77,7 @@ class GlobalJavascript {
 	 * @return void
 	 */
 	public function register_admin_scripts() {
-		wp_enqueue_script( 'global-javascript-admin-script', plugins_url( '/global-javascript/js/codemirror.js' ) );
+		wp_enqueue_script( 'global-javascript-admin-script', plugins_url( GLOBAL_JAVASCRIPT_PATH . '/js/codemirror.js' ) );
 	}
 	
 	
@@ -93,7 +97,7 @@ class GlobalJavascript {
 			'parent' => 'appearance',
 			'id' => 'custom-js',
 			'title' => __( 'Custom JS' ),
-			'href' => admin_url( 'themes.php?page=global-javascript/global-javascript.php' )
+			'href' => admin_url( 'themes.php?page=' . GLOBAL_JAVASCRIPT_PATH . '/global-javascript.php' )
 		) );
 	}
 	
@@ -109,7 +113,7 @@ class GlobalJavascript {
 		
 		if ( isset( $post ) && ( 's-custom-js' == $post->post_type ) )
 			if ( strstr( $post_link, 'action=edit' ) && !strstr( $post_link, 'revision=' ) )
-				$post_link = 'themes.php?page=global-javascript/global-javascript.php';
+				$post_link = 'themes.php?page=' . GLOBAL_JAVASCRIPT_PATH . '/global-javascript.php';
 		
 		return $post_link;
 	
@@ -204,25 +208,28 @@ class GlobalJavascript {
 	 * @return void
 	 */
 	private function save_to_external_file( $js_to_save ) {
-		$file = WP_PLUGIN_DIR."/global-javascript/js/global-javascript-actual.js";
+		$url = wp_nonce_url('themes.php?page=' . GLOBAL_JAVASCRIPT_PATH);
+		$method = '';
+		if ( false === ($creds = request_filesystem_credentials($url, $method, false, false, null ) ) ) {
+			// don't have credentials yet
+			// so stop processing
+			return true;
+		}
+		// got the creds
+		if ( !WP_Filesystem($creds) ) {
+			//creds no good, ask user for them again
+			request_file_system_credentials($url, method, true, false, null);
+			return true;
+		}
 		
-		if( is_writable( $file ) ) {
-			if( !$handle = fopen( $file, 'w' ) ) {
-				echo "Cannot open file...";
-				exit;
-			}
-			if( fwrite( $handle, $js_to_save ) === FALSE ) {
-				echo "Cannot write to file...";
-				exit;
-			}
-			
-			echo "Success, wrote to file!";
-			
-			fclose( $handle );
+		$gj_upload_directory = wp_upload_dir();
+		$global_js_filename = trailingslashit($gj_upload_directory['path']).'global-javascript-actual.js';
+		
+		global $wp_filesystem;
+		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) ) {
+			echo "Error saving the file...";
 		}
-		else {
-			echo "The file $file is not writable";
-		}
+		
 	}
 	
 	/**
@@ -275,7 +282,10 @@ class GlobalJavascript {
 		if(!is_array($global_js_js))
 			$global_js_js = array( $global_js_js );
 		
-		echo '<script type="text/javascript" src="' . plugins_url( 'global-javascript/js/global-javascript-actual.js' ) . '">' . '</script>' . "\n";
+		$global_javascript_upload_dir = wp_upload_dir();
+		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['url']) . 'global-javascript-actual.js';
+		
+		echo '<script type="text/javascript" src="' . $global_javascript_filename . '">' . '</script>' . "\n";
 		//echo '</script>' . "\n";
 			
 		/*echo '<script type="text/javascript">' . "\n";
