@@ -25,6 +25,14 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.9 - changed the way javascript is saved
+        * previous method of saving was producing unintended results
+        * new method still requires some testing on multisites
+        * new method involves the use of the wp_filesystem
+        * codex.wordpress.org/Filesystem_API
+     - changed the way the paths work
+        * this new method should work regardless of what the parent directory is called
+
 v0.8 - changed the way javascript is injected to the page 
         * javascript is now injected from an external file
      - javascript is now saved to an external javascript file as well
