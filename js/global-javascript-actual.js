@@ -1,3 +1,8 @@
+/*** UNUSED FILE ***/
+/*** UNUSED FILE ***/
+/*** UNUSED FILE ***/
+
+
 /* Welcome to Global Javascript!
 	
 If you are familiar with Javascript, you may delete these comments and get started. Javascript allows websites to have dynamic content. Here's an example:
@@ -33,4 +38,5 @@ Things we encourage include:
 (adapted from WordPress.com)
 */
 
-alert("welcome");
+alert("123");
+alert("hello");
