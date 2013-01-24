@@ -28,9 +28,10 @@ and then Frederick Ding http://simplerplugins.wordpress.com
 */
 
 /** Constants **/
-define( 'GLOBAL_JAVASCRIPT_PATH', plugin_basename( dirname( __FILE__ ) ) );
+//define( 'GLOBAL_JAVASCRIPT_PATH', plugin_basename( dirname( __FILE__ ) ) );
 
 class GlobalJavascript {
+	static $path = null;
 	/***************
 	 * Constructor *
 	 ***************/
@@ -38,6 +39,8 @@ class GlobalJavascript {
 		/*if( $_GET['code'] != 'none' ):
 			add_action('admin_print_scripts-appearance_page_global-javascript/global-javascript', 'global_javascript_admin_print_scripts');
 		endif;*/
+		
+		self::$path = plugin_basename( dirname( __FILE__ ) );
 		
 		// register admin styles and scripts
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts') );
@@ -58,7 +61,7 @@ class GlobalJavascript {
 	 * @return void
 	 */
 	public function register_admin_styles() {
-		wp_enqueue_style( 'global-javascript-admin-styles', plugins_url(GLOBAL_JAVASCRIPT_PATH . '/css/styles.css') );
+		wp_enqueue_style( 'global-javascript-admin-styles', plugins_url( self::$path . '/css/styles.css' ) );
 	}
 	
 	/**
@@ -77,7 +80,7 @@ class GlobalJavascript {
 	 * @return void
 	 */
 	public function register_admin_scripts() {
-		wp_enqueue_script( 'global-javascript-admin-script', plugins_url( GLOBAL_JAVASCRIPT_PATH . '/js/codemirror.js' ) );
+		wp_enqueue_script( 'global-javascript-admin-script', plugins_url( self::$path . '/js/codemirror.js' ) );
 	}
 	
 	
@@ -97,7 +100,7 @@ class GlobalJavascript {
 			'parent' => 'appearance',
 			'id' => 'custom-js',
 			'title' => __( 'Custom JS' ),
-			'href' => admin_url( 'themes.php?page=' . GLOBAL_JAVASCRIPT_PATH . '/global-javascript.php' )
+			'href' => admin_url( 'themes.php?page=' . self::$path . '/global-javascript.php' )
 		) );
 	}
 	
@@ -113,7 +116,7 @@ class GlobalJavascript {
 		
 		if ( isset( $post ) && ( 's-custom-js' == $post->post_type ) )
 			if ( strstr( $post_link, 'action=edit' ) && !strstr( $post_link, 'revision=' ) )
-				$post_link = 'themes.php?page=' . GLOBAL_JAVASCRIPT_PATH . '/global-javascript.php';
+				$post_link = 'themes.php?page=' . self::$path . '/global-javascript.php';
 		
 		return $post_link;
 	
@@ -208,7 +211,7 @@ class GlobalJavascript {
 	 * @return void
 	 */
 	private function save_to_external_file( $js_to_save ) {
-		$url = wp_nonce_url('themes.php?page=' . GLOBAL_JAVASCRIPT_PATH);
+		$url = wp_nonce_url('themes.php?page=' . self::$path);
 		$method = '';
 		if ( false === ($creds = request_filesystem_credentials($url, $method, false, false, null ) ) ) {
 			// don't have credentials yet
@@ -385,9 +388,9 @@ Things we encourage include:
 	<div id="poststuff" class="metabox-holder<?php echo 2 == $screen_layout_columns ? ' has-right-sidebar' : ''; ?>">
 	<ul class="subsubsub">
 		<?php if($_GET['code'] !="none" ): ?>
-		<li ><strong>Advanced Editor</strong> switch to: <a  href="?page=global-javascript/global-javascript.php&code=none">simpler</a></li>
+		<li ><strong>Advanced Editor</strong> switch to: <?php echo '<a  href="?page=' . self::$path . '/global-javascript.php&code=none">simpler</a>'?></li>
 		<?php else: ?>
-		<li ><strong>Simple Editor</strong> switch to: <a  href="?page=global-javascript/global-javascript.php">advance</a></li>
+		<li ><strong>Simple Editor</strong> switch to: <?php echo '<a  href="?page=' . self::$path . '/global-javascript.php">advance</a>'?></li>
 		<?php endif; ?>
 	</ul>
 	<div id="code-version-toggle">
@@ -398,7 +401,7 @@ Things we encourage include:
 			<input onclick="replace1();" type="button" class="button" value="Replace All"> 
 			</p>
 		<?php endif; ?>
-		<form method="post" action="themes.php?page=global-javascript/global-javascript.php<?php if($_GET['code'] == "none") {echo "&code=none"; } ?>">
+		<?php echo '<form method="post" action="themes.php?page=' . self::$path . '/global-javascript.php'?><?php if($_GET['code'] == "none") {echo "&code=none"; } ?>">
 			<?php settings_fields('global_js_options'); ?>
 			<?php wp_nonce_field( 'update_global_js_js','update_global_js_js_field' ); ?>
 			<textarea cols="80" rows="25" id="global_js_js" name="<?php echo $opt_name; ?>"><?php echo $js_val[0]; ?></textarea>
@@ -409,7 +412,7 @@ Things we encourage include:
 	
 	<?php 
 		if($_GET['code'] !="none"): 
-			wp_enqueue_script( 'global-javascript-loading', plugins_url( '/js/global-javascript-loading.js', __FILE__ ) );
+			wp_enqueue_script( 'global-javascript-loading', plugins_url( self::$path . '/js/global-javascript-loading.js' ) );
 		endif; 
 	
 		$safejs_post = $this->gj_get_js();
