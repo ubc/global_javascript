@@ -25,6 +25,9 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.9.1 - fixed a bug where files were not being saved properly using the new method
+       - fixed a bug where the redirect was giving a permissions error
+
 v0.9 - changed the way javascript is saved
         * previous method of saving was producing unintended results
         * new method still requires some testing on multisites
