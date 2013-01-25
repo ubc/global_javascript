@@ -235,22 +235,18 @@ class GlobalJavascript {
 		$temp_target = trailingslashit( $global_js_upload_directory['basedir'] ) . 'global-javascript';
 		if( !is_dir( $temp_target ) ):
 			if( wp_mkdir_p( $temp_target ) ):
-				echo "directory created at $temp_target <br/>";
+				echo '<script>alert("Directory created at $temp_target");</script>';
 			else:
-				echo "canot create directory <br/>";
+				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
-		else:
-			echo "directory already exists <br/>";
 		endif;
 		$temp_target = trailingslashit( $temp_target ) . $global_js_current_blog_id;
 		if( !is_dir( $temp_target ) ):
 			if( wp_mkdir_p( $temp_target ) ):
-				echo "directory created at $temp_target <br/>";
+				echo '<script>alert("Directory created at $temp_target");</script>';
 			else:
-				echo "cannot create directory <br/>";
+				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
-		else:
-			echo "directory already exists <br/>";
 		endif;
 		
 		$global_js_upload_directory['basedir'] = trailingslashit($temp_target);
@@ -321,22 +317,18 @@ class GlobalJavascript {
 		$temp_target = trailingslashit( $global_javascript_upload_dir['basedir'] ) . 'global-javascript';
 		if( !is_dir( $temp_target ) ):
 			if( wp_mkdir_p( $temp_target ) ):
-				echo "directory created at $temp_target <br/>";
+				echo '<script>alert("Directory created at $temp_target");</script>';
 			else:
-				echo "canot create directory <br/>";
+				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
-		else:
-			echo "directory already exists <br/>";
 		endif;
 		$temp_target = trailingslashit( $temp_target ) . $global_javascript_blog_id;
 		if( !is_dir( $temp_target ) ):
 			if( wp_mkdir_p( $temp_target ) ):
-				echo "directory created at $temp_target <br/>";
+				echo '<script>alert("Directory created at $temp_target");</script>';
 			else:
-				echo "cannot create directory <br/>";
+				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
-		else:
-			echo "directory already exists <br/>";
 		endif;
 		
 		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . 'global-javascript/' . $global_javascript_blog_id . '/global-javascript-actual.js';
