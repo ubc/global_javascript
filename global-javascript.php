@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.9.1
+Version: 0.9.2
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -28,10 +28,13 @@ and then Frederick Ding http://simplerplugins.wordpress.com
 */
 
 /** Constants **/
-//define( 'GLOBAL_JAVASCRIPT_PATH', plugin_basename( dirname( __FILE__ ) ) );
+// define( 'GLOBAL_JAVASCRIPT_PATH', plugin_basename( dirname( __FILE__ ) ) );
+// someone could have used the above symbolic constant
+// will be removed in release version for code cleanup 
 
 class GlobalJavascript {
 	static $path = null;
+	
 	/***************
 	 * Constructor *
 	 ***************/
@@ -52,8 +55,8 @@ class GlobalJavascript {
 		add_filter('get_edit_post_link', array( $this, 'revision_post_link' ) );
 		add_action ( 'admin_menu', array( $this, 'gj_menu' ) );
 		add_action ( 'wp_head', array( $this, 'add_js' ) );
-	}	
-	
+	}
+	 
 	/**
 	 * register_admin_styles function.
 	 * adds styles to the admin page
@@ -225,8 +228,35 @@ class GlobalJavascript {
 			return true;
 		}
 		
-		$gj_upload_directory = wp_upload_dir();
-		$global_js_filename = trailingslashit($gj_upload_directory['path']).'global-javascript-actual.js';
+		$global_js_current_blog_id = get_current_blog_id();
+		$global_js_upload_directory = wp_upload_dir();
+		
+		// do some uploads directory stuff
+		$temp_target = trailingslashit( $global_js_upload_directory['basedir'] ) . 'global-javascript';
+		if( !is_dir( $temp_target ) ):
+			if( wp_mkdir_p( $temp_target ) ):
+				echo "directory created at $temp_target <br/>";
+			else:
+				echo "canot create directory <br/>";
+			endif;
+		else:
+			echo "directory already exists <br/>";
+		endif;
+		$temp_target = trailingslashit( $temp_target ) . $global_js_current_blog_id;
+		if( !is_dir( $temp_target ) ):
+			if( wp_mkdir_p( $temp_target ) ):
+				echo "directory created at $temp_target <br/>";
+			else:
+				echo "cannot create directory <br/>";
+			endif;
+		else:
+			echo "directory already exists <br/>";
+		endif;
+		
+		$global_js_upload_directory['basedir'] = trailingslashit($temp_target);
+		//echo $global_js_upload_directory['basedir'] . '<br/>';
+		$global_js_filename = trailingslashit($global_js_upload_directory['basedir']) . 'global-javascript-actual.js';
+		//echo $global_js_filename . '<br/>';
 		
 		global $wp_filesystem;
 		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) ) {
@@ -285,8 +315,31 @@ class GlobalJavascript {
 		if(!is_array($global_js_js))
 			$global_js_js = array( $global_js_js );
 		
+		$global_javascript_blog_id = get_current_blog_id();
 		$global_javascript_upload_dir = wp_upload_dir();
-		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['url']) . 'global-javascript-actual.js';
+		
+		$temp_target = trailingslashit( $global_javascript_upload_dir['basedir'] ) . 'global-javascript';
+		if( !is_dir( $temp_target ) ):
+			if( wp_mkdir_p( $temp_target ) ):
+				echo "directory created at $temp_target <br/>";
+			else:
+				echo "canot create directory <br/>";
+			endif;
+		else:
+			echo "directory already exists <br/>";
+		endif;
+		$temp_target = trailingslashit( $temp_target ) . $global_javascript_blog_id;
+		if( !is_dir( $temp_target ) ):
+			if( wp_mkdir_p( $temp_target ) ):
+				echo "directory created at $temp_target <br/>";
+			else:
+				echo "cannot create directory <br/>";
+			endif;
+		else:
+			echo "directory already exists <br/>";
+		endif;
+		
+		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . 'global-javascript/' . $global_javascript_blog_id . '/global-javascript-actual.js';
 		
 		echo '<script type="text/javascript" src="' . $global_javascript_filename . '">' . '</script>' . "\n";
 		//echo '</script>' . "\n";
