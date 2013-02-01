@@ -25,6 +25,8 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.10.1 - fixed a bug where single line comments were not being replaced
+
 v0.10 - added a regex replacer to prepare for minification in next release
       - added additional saving that utilizes unix timestamping to prep for future loading method
 
