@@ -25,6 +25,8 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.10.3 - cleaned up some of the code as well as changing the editor name to be more descriptive and similar to plugin name
+
 v0.10.2 - fixed a bug where previously uploaded files are not deleted
 
 v0.10.1 - fixed a bug where single line comments were not being replaced
