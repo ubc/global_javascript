@@ -27,10 +27,6 @@ and then Frederick Ding http://simplerplugins.wordpress.com
 	Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA
 */
 
-/** Constants **/
-// define( 'GLOBAL_JAVASCRIPT_PATH', plugin_basename( dirname( __FILE__ ) ) );
-// someone could have used the above symbolic constant
-// will be removed in release version for code cleanup 
 
 class GlobalJavascript {
 	static $path = null;
@@ -44,7 +40,12 @@ class GlobalJavascript {
 		endif;*/
 		
 		self::$path = plugin_basename( dirname( __FILE__ ) );
-		
+		if ( !class_exists( 'Minify' ) ) {
+			require plugin_dir_path( __FILE__ ) . '/lib/Minify.php';
+		}
+		else {
+			echo 'class already exists<br/>';
+		}
 		// register admin styles and scripts
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts') );
 		add_action( 'admin_print_styles', array( $this, 'register_admin_styles' ) );
@@ -232,7 +233,7 @@ class GlobalJavascript {
 		$global_js_upload_directory = wp_upload_dir();
 		
 		// do some uploads directory stuff
-		$temp_target = trailingslashit( $global_js_upload_directory['basedir'] ) . 'global-javascript';
+		/*$temp_target = trailingslashit( $global_js_upload_directory['basedir'] ) . 'global-javascript';
 		if( !is_dir( $temp_target ) ):
 			if( wp_mkdir_p( $temp_target ) ):
 				echo '<script>alert("Directory created at $temp_target");</script>';
@@ -249,14 +250,16 @@ class GlobalJavascript {
 			endif;
 		endif;
 		
-		$global_js_upload_directory['basedir'] = trailingslashit($temp_target);
+		$global_js_upload_directory['basedir'] = trailingslashit($temp_target);*/
 		//echo $global_js_upload_directory['basedir'] . '<br/>';
 		$global_js_filename = trailingslashit($global_js_upload_directory['basedir']) . 'global-javascript-actual.js';
+		$global_js_minified = trailingslashit($global_js_upload_directory['basedir']) .'minified-' . time() . '-global-javascript-actual.js';
 		//echo $global_js_filename . '<br/>';
 		
 		global $wp_filesystem;
-		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) ) {
-			echo "Error saving the file...";
+		$minified_global_js = $this->gj_filter( $js_to_save );
+		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) || !!$wp_filesystem->put_contents( $global_js_minified, $minified_global_js, FS_CHMOD_FILE ) ) {
+			echo "<script>Error saving the file...</script>";
 		}
 		
 	}
@@ -314,7 +317,7 @@ class GlobalJavascript {
 		$global_javascript_blog_id = get_current_blog_id();
 		$global_javascript_upload_dir = wp_upload_dir();
 		
-		$temp_target = trailingslashit( $global_javascript_upload_dir['basedir'] ) . 'global-javascript';
+		/*$temp_target = trailingslashit( $global_javascript_upload_dir['basedir'] ) . 'global-javascript';
 		if( !is_dir( $temp_target ) ):
 			if( wp_mkdir_p( $temp_target ) ):
 				echo '<script>alert("Directory created at $temp_target");</script>';
@@ -329,9 +332,9 @@ class GlobalJavascript {
 			else:
 				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
-		endif;
+		endif;*/
 		
-		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . 'global-javascript/' . $global_javascript_blog_id . '/global-javascript-actual.js';
+		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . 'global-javascript-actual.js';
 		
 		echo '<script type="text/javascript" src="' . $global_javascript_filename . '">' . '</script>' . "\n";
 		//echo '</script>' . "\n";
@@ -342,8 +345,10 @@ class GlobalJavascript {
 	}
 	
 	public function gj_filter( $_content ) {
-		$_return = preg_replace ( '/@import.+;( |)|((?:\/\*(?:[^*]|(?:\*+[^*\/]))*\*+\/))/i', '', $_content );
-		$_return = htmlspecialchars ( strip_tags( $_return ), ENT_NOQUOTES, 'UTF-8' );
+		// remove contents
+		$_content = preg_replace( '!/\*[^*]*\*+([^/][^*]*\*+)*/!' , '', $_content);
+		// remove white space
+		$_return = str_replace( array( "\r\n", "\r", "\n", "\t", '  ', '    ', '    ' ), '', $_content);
 		return $_return;
 	}
 	
