@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.10.1
+Version: 0.10.2
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -229,28 +229,38 @@ class GlobalJavascript {
 			return true;
 		}
 		
-		$global_js_current_blog_id = get_current_blog_id();
 		$global_js_upload_directory = wp_upload_dir();
 		
 		// do some uploads directory stuff
-		$global_js_upload_directory = trailingslashit( $global_js_upload_directory['basedir'] ) . 'global-javascript';
-		if( !is_dir( $global_js_upload_directory ) ):
-			if( wp_mkdir_p( $global_js_upload_directory ) ):
-				echo '<script>alert("Directory created at $global_js_upload_directory");</script>';
+		$global_js_temp_directory = trailingslashit( $global_js_upload_directory['basedir'] ) . self::$path;
+		if( !is_dir( $global_js_temp_directory ) ):
+			if( wp_mkdir_p( $global_js_temp_directory ) ):
+				echo '<script>alert("Directory created at $global_js_temp_directory");</script>';
 			else:
 				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
 		endif;
 
-		$global_js_filename = trailingslashit($global_js_upload_directory['basedir']) . 'global-javascript-actual.js';
-		$global_js_minified = trailingslashit($global_js_upload_directory['basedir']) . time() . '-global-javascript-minified.js';
+		$global_js_filename = trailingslashit( $global_js_temp_directory ) . 'global-javascript-actual.js';
+		$global_js_minified = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript-minified.js';
 		
 		global $wp_filesystem;
 		$minified_global_js = $this->gj_filter( $js_to_save );
-		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) || !!$wp_filesystem->put_contents( $global_js_minified, $minified_global_js, FS_CHMOD_FILE ) ) {
-			echo "<script>Error saving the file...</script>";
-		}
-		
+		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) || !$wp_filesystem->put_contents( $global_js_minified, $minified_global_js, FS_CHMOD_FILE ) ):
+			echo '<script>alert("Error saving the file...");</script>';
+		else:
+			//echo filemtime( $global_js_temp_directory . '/global-javascript-actual.js' );
+			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) . self::$path ) ):
+				$global_js_newest_filetime = filemtime( $global_js_temp_directory . '/global-javascript-actual.js' );
+				while( false !== ( $global_js_files = readdir( $global_js_handle ) ) ):
+					$global_js_filelastcreated = filemtime( $global_js_temp_directory . '/' . $global_js_files );
+					if( $global_js_filelastcreated < $global_js_newest_filetime ):
+						unlink( $global_js_temp_directory . '/' . $global_js_files );
+					endif;
+				endwhile;
+				closedir( $global_js_handle );
+			endif;
+		endif;
 	}
 	
 	/**
@@ -293,7 +303,6 @@ class GlobalJavascript {
 				return false;
 			endif;
 		endif; 
-	
 	}
 	
 	
@@ -303,20 +312,19 @@ class GlobalJavascript {
 		if(!is_array($global_js_js))
 			$global_js_js = array( $global_js_js );
 		
-		$global_javascript_blog_id = get_current_blog_id();
 		$global_javascript_upload_dir = wp_upload_dir();
 		
-		$global_javascript_upload_dir = trailingslashit( $global_javascript_upload_dir['basedir'] ) . 'global-javascript';
-		if( !is_dir( $global_javascript_upload_dir ) ):
-			if( wp_mkdir_p( $global_javascript_upload_dir ) ):
-				echo '<script>alert("Directory created at $temp_target");</script>';
+		$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] ) . self::$path;
+		if( !is_dir( $gj_temp_link ) ):
+			if( wp_mkdir_p( $gj_temp_link ) ):
+				echo '<script>alert("Directory created at $global_javascript_upload_dir");</script>';
 			else:
 				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
 		endif;
 		
-		
-		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . 'global-javascript-actual.js';
+		$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
+		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . self::$path . '/' . $global_javascript_minified_time .'-global-javascript-minified.js';
 		
 		echo '<script type="text/javascript" src="' . $global_javascript_filename . '">' . '</script>' . "\n";
 	}
