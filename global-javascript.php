@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.10.2
+Version: 0.10.3
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -102,8 +102,8 @@ class GlobalJavascript {
 		// we can add a submenu item too
 		$wp_admin_bar->add_menu( array(
 			'parent' => 'appearance',
-			'id' => 'custom-js',
-			'title' => __( 'Custom JS' ),
+			'id' => 'global-javascript',
+			'title' => __( 'Global JavaScript Editor' ),
 			'href' => admin_url( 'themes.php?page=' . self::$path . '/global-javascript.php' )
 		) );
 	}
@@ -118,7 +118,7 @@ class GlobalJavascript {
 	public function revision_post_link( $post_link ) {
 		global $post;
 		
-		if ( isset( $post ) && ( 's-custom-js' == $post->post_type ) )
+		if ( isset( $post ) && ( 's-global-javascript' == $post->post_type ) )
 			if ( strstr( $post_link, 'action=edit' ) && !strstr( $post_link, 'revision=' ) )
 				$post_link = 'themes.php?page=' . self::$path . '/global-javascript.php';
 		
@@ -143,7 +143,7 @@ class GlobalJavascript {
 			'capability_type' => 'nav_menu_item',
 			'supports' 		=> array( 'revisions' )
 		); 
-		register_post_type( 's-custom-js', array(
+		register_post_type( 's-global-javascript', array(
 			'supports' => array( 'revisions' )
 		) );
 		
@@ -162,9 +162,9 @@ class GlobalJavascript {
 		if ( !$safejs_post = $this->gj_get_js() ) {
 			$post = array();
 			$post['post_content'] = $js;
-			$post['post_title']   = 'Custom JS';
+			$post['post_title']   = 'Global JavaScript Editor';
 			$post['post_status']  = 'publish';
-			$post['post_type']    = 's-custom-js';
+			$post['post_type']    = 's-global-javascript';
 			
 			// check if there are any settings data 
 			$global_js_js = get_option ( 'global_js_js' );
@@ -271,7 +271,7 @@ class GlobalJavascript {
 	 */
 	public function gj_get_js() {
 	
-		if ( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-custom-js', 'post_status' => 'publish' ) ) ) )
+		if ( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ) )
 			$safejs_post = get_object_vars( $a );
 		else
 			$safejs_post = false;
@@ -286,7 +286,7 @@ class GlobalJavascript {
 	 */
 	public function always_get_js() {
 		
-		if ( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-custom-js', 'post_status' => 'publish' ) ) ) ):
+		if ( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ) ):
 			$safejs_post = get_object_vars( $a );
 			return $safejs_post['post_content'];
 		// if there is no 
@@ -339,7 +339,7 @@ class GlobalJavascript {
 	}
 	
 	public function gj_menu() {
-		add_theme_page ( 'Custom JS', 'Custom JS', 8, __FILE__, array( $this, 'gj_options' ) );
+		add_theme_page ( 'Global Javascript', 'Global Javascript', 8, __FILE__, array( $this, 'gj_options' ) );
 	}
 	
 	public function gj_options() {
@@ -408,19 +408,19 @@ Things we encourage include:
 				
 		if( $message_number ):
 			
-			$messages['s-custom-js'] = array(
-			 1 => "Custom JS Saved",
-			 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Custom JS restored to revision from %s, <em>Save Changes for the revision to take effect</em>'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false
+			$messages['s-global-javascript'] = array(
+			 1 => "Global Javascript Saved",
+			 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Global Javascript restored to revision from %s, <em>Save Changes for the revision to take effect</em>'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false
 			 );
 			 $messages = apply_filters( 'post_updated_messages', $messages );
 			 ?>
-			<div class="updated"><p><strong><?php echo $messages['s-custom-js'][$message_number]; ?></strong></p></div>		
+			<div class="updated"><p><strong><?php echo $messages['s-global-javascript'][$message_number]; ?></strong></p></div>		
 		<?php endif ?>
 	
 	
 	<div class="wrap">
 	<div class="icon32" id="icon-themes"><br></div>
-	<h2>Custom JS</h2>
+	<h2>Global Javascript Editor</h2>
 	<div id="poststuff" class="metabox-holder<?php echo 2 == $screen_layout_columns ? ' has-right-sidebar' : ''; ?>">
 	<ul class="subsubsub">
 		<?php if($_GET['code'] !="none" ): ?>
@@ -464,8 +464,8 @@ Things we encourage include:
 				wp_list_post_revisions( $safejs_post['ID'], $args );
 			}
 	
-			add_meta_box( 'revisionsdiv', __( 'JS Revisions', 'safejs' ), 'post_revisions_meta_box', 's-custom-js', 'normal' );
-		do_meta_boxes( 's-custom-js', 'normal', $safejs_post );
+			add_meta_box( 'revisionsdiv', __( 'JS Revisions', 'safejs' ), 'post_revisions_meta_box', 's-global-javascript', 'normal' );
+		do_meta_boxes( 's-global-javascript', 'normal', $safejs_post );
 		}
 	?>
 	</div></div>
