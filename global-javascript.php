@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.10
+Version: 0.10.1
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -40,12 +40,12 @@ class GlobalJavascript {
 		endif;*/
 		
 		self::$path = plugin_basename( dirname( __FILE__ ) );
-		if ( !class_exists( 'Minify' ) ) {
+		/*if ( !class_exists( 'Minify' ) ) {
 			require plugin_dir_path( __FILE__ ) . '/lib/Minify.php';
 		}
 		else {
 			echo 'class already exists<br/>';
-		}
+		}*/
 		// register admin styles and scripts
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts') );
 		add_action( 'admin_print_styles', array( $this, 'register_admin_styles' ) );
@@ -345,7 +345,8 @@ class GlobalJavascript {
 	}
 	
 	public function gj_filter( $_content ) {
-		// remove contents
+		// remove comments
+		$_content = preg_replace( '/(?<!\S)\/\/\s*[^\r\n]*/', '', $_content);
 		$_content = preg_replace( '!/\*[^*]*\*+([^/][^*]*\*+)*/!' , '', $_content);
 		// remove white space
 		$_return = str_replace( array( "\r\n", "\r", "\n", "\t", '  ', '    ', '    ' ), '', $_content);
