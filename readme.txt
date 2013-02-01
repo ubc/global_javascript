@@ -29,6 +29,7 @@ v0.10.1 - fixed a bug where single line comments were not being replaced
 
 v0.10 - added a regex replacer to prepare for minification in next release
       - added additional saving that utilizes unix timestamping to prep for future loading method
+      - plugin now saves external javascript to a custom directory in uploads by site and create one if not available
 
 v0.9.2 - changed the behaviour of the Javascript saving and loading
 
