@@ -25,6 +25,8 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.10.2 - fixed a bug where previously uploaded files are not deleted
+
 v0.10.1 - fixed a bug where single line comments were not being replaced
         - plugin now saves external javascript to a custom directory in uploads by site and creates one if not available
 
