@@ -233,28 +233,17 @@ class GlobalJavascript {
 		$global_js_upload_directory = wp_upload_dir();
 		
 		// do some uploads directory stuff
-		/*$temp_target = trailingslashit( $global_js_upload_directory['basedir'] ) . 'global-javascript';
-		if( !is_dir( $temp_target ) ):
-			if( wp_mkdir_p( $temp_target ) ):
-				echo '<script>alert("Directory created at $temp_target");</script>';
+		$global_js_upload_directory = trailingslashit( $global_js_upload_directory['basedir'] ) . 'global-javascript';
+		if( !is_dir( $global_js_upload_directory ) ):
+			if( wp_mkdir_p( $global_js_upload_directory ) ):
+				echo '<script>alert("Directory created at $global_js_upload_directory");</script>';
 			else:
 				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
 		endif;
-		$temp_target = trailingslashit( $temp_target ) . $global_js_current_blog_id;
-		if( !is_dir( $temp_target ) ):
-			if( wp_mkdir_p( $temp_target ) ):
-				echo '<script>alert("Directory created at $temp_target");</script>';
-			else:
-				echo '<script>alert("Error: Cannot create directory");</script>';
-			endif;
-		endif;
-		
-		$global_js_upload_directory['basedir'] = trailingslashit($temp_target);*/
-		//echo $global_js_upload_directory['basedir'] . '<br/>';
+
 		$global_js_filename = trailingslashit($global_js_upload_directory['basedir']) . 'global-javascript-actual.js';
-		$global_js_minified = trailingslashit($global_js_upload_directory['basedir']) .'minified-' . time() . '-global-javascript-actual.js';
-		//echo $global_js_filename . '<br/>';
+		$global_js_minified = trailingslashit($global_js_upload_directory['basedir']) . time() . '-global-javascript-minified.js';
 		
 		global $wp_filesystem;
 		$minified_global_js = $this->gj_filter( $js_to_save );
@@ -317,31 +306,19 @@ class GlobalJavascript {
 		$global_javascript_blog_id = get_current_blog_id();
 		$global_javascript_upload_dir = wp_upload_dir();
 		
-		/*$temp_target = trailingslashit( $global_javascript_upload_dir['basedir'] ) . 'global-javascript';
-		if( !is_dir( $temp_target ) ):
-			if( wp_mkdir_p( $temp_target ) ):
+		$global_javascript_upload_dir = trailingslashit( $global_javascript_upload_dir['basedir'] ) . 'global-javascript';
+		if( !is_dir( $global_javascript_upload_dir ) ):
+			if( wp_mkdir_p( $global_javascript_upload_dir ) ):
 				echo '<script>alert("Directory created at $temp_target");</script>';
 			else:
 				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
 		endif;
-		$temp_target = trailingslashit( $temp_target ) . $global_javascript_blog_id;
-		if( !is_dir( $temp_target ) ):
-			if( wp_mkdir_p( $temp_target ) ):
-				echo '<script>alert("Directory created at $temp_target");</script>';
-			else:
-				echo '<script>alert("Error: Cannot create directory");</script>';
-			endif;
-		endif;*/
+		
 		
 		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . 'global-javascript-actual.js';
 		
 		echo '<script type="text/javascript" src="' . $global_javascript_filename . '">' . '</script>' . "\n";
-		//echo '</script>' . "\n";
-			
-		/*echo '<script type="text/javascript">' . "\n";
-		echo $this->gj_filter( $this->always_get_js() ) . "\n";
-		echo '</script>' . "\n";*/
 	}
 	
 	public function gj_filter( $_content ) {
