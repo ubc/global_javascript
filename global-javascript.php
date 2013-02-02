@@ -103,7 +103,7 @@ class GlobalJavascript {
 		$wp_admin_bar->add_menu( array(
 			'parent' => 'appearance',
 			'id' => 'global-javascript',
-			'title' => __( 'Global JavaScript Editor' ),
+			'title' => __( 'Global Javascript Editor' ),
 			'href' => admin_url( 'themes.php?page=' . self::$path . '/global-javascript.php' )
 		) );
 	}
@@ -162,7 +162,7 @@ class GlobalJavascript {
 		if ( !$safejs_post = $this->gj_get_js() ) {
 			$post = array();
 			$post['post_content'] = $js;
-			$post['post_title']   = 'Global JavaScript Editor';
+			$post['post_title']   = 'Global Javascript Editor';
 			$post['post_status']  = 'publish';
 			$post['post_type']    = 's-global-javascript';
 			
