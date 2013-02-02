@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.10.3
+Version: 0.11
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -40,12 +40,7 @@ class GlobalJavascript {
 		endif;*/
 		
 		self::$path = plugin_basename( dirname( __FILE__ ) );
-		/*if ( !class_exists( 'Minify' ) ) {
-			require plugin_dir_path( __FILE__ ) . '/lib/Minify.php';
-		}
-		else {
-			echo 'class already exists<br/>';
-		}*/
+		
 		// register admin styles and scripts
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts') );
 		add_action( 'admin_print_styles', array( $this, 'register_admin_styles' ) );
@@ -324,9 +319,15 @@ class GlobalJavascript {
 		endif;
 		
 		$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
-		$global_javascript_filename = trailingslashit($global_javascript_upload_dir['baseurl']) . self::$path . '/' . $global_javascript_minified_time .'-global-javascript-minified.js';
+		$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . self::$path . '/' . $global_javascript_minified_time .'-global-javascript-minified.js';
+		$global_javascript_actual_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . self::$path . '/global-javascript-actual.js';
 		
-		echo '<script type="text/javascript" src="' . $global_javascript_filename . '">' . '</script>' . "\n";
+		if( WP_DEBUG == false ):
+			echo '<script type="text/javascript" src="' . $global_javascript_minified_file . '"></script>' . "\n";
+		else:
+			echo 'You are currently in debug mode...<br/>';
+			echo '<script type="text/javascript" src="' . $global_javascript_actual_file . '"></script>' . "\n";
+		endif;
 	}
 	
 	public function gj_filter( $_content ) {
