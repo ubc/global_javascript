@@ -25,6 +25,10 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 
 === Changelog ===
 
+v0.11 - added a conditional to check if WP_DEBUG is set to true
+        * if WP_DEBUG is true plugin will load the non stripped version of the javascript
+        * no other additional changes to the plugin if in debug mode
+
 v0.10.3 - cleaned up some of the code as well as changing the editor name to be more descriptive and similar to plugin name
         - fixed some typos that caused javascript to not load properly
 
