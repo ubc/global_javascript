@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.11
+Version: 0.11.1
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -64,14 +64,46 @@ class GlobalJavascript {
 	}
 	
 	/**
-	 * register_admin_scripts function.
-	 * adds the pos
-	 * @access public
-	 * @return void
-	 */
-	/*function global_javascript_admin_enqueue_scripts() {
-		// wp_enqueue_script( 'postbox' );
-	}*/
+	 * activate function
+     * fired when the plugin is activated
+     * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
+     */
+    public function activate( $network_wide ) {
+        // TODO: Define activation functionality here
+        // create the necessary folders and files for plugin to work
+        $create_upload_dir_path = wp_upload_dir();
+
+        // create the directory here
+        $temp_dir_path = trailingslashit( $create_upload_dir_path['basedir'] ) . self::$path;
+        if ( !is_dir( $temp_dir_path ) ):
+            if ( wp_mkdir_p( $temp_dir_path ) ):
+                echo '<script>alert("Directory created at ' . $temp_dir_path . '");</script>';
+            else:
+                echo '<script>alert("Error: Failed to create directory");</script>';
+            endif;
+        endif;
+    }
+
+    /**
+     * deactivate function
+     * fired when the plugin is deactivated
+     * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
+     */
+    public function deactivate( $network_wide ) {
+        // TODO: Define deactivation functionality here
+
+    }
+
+    /**
+     * uninstall function
+     * fired when plugin is uninstalled
+     * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
+     */
+    public function unistall( $network_wide ) {
+        // TODO: Define uninstall functionality here
+
+    }
+
 	/**
 	 * global_javascript_admin_print_scripts function.
 	 * 
@@ -230,7 +262,7 @@ class GlobalJavascript {
 		$global_js_temp_directory = trailingslashit( $global_js_upload_directory['basedir'] ) . self::$path;
 		if( !is_dir( $global_js_temp_directory ) ):
 			if( wp_mkdir_p( $global_js_temp_directory ) ):
-				echo '<script>alert("Directory created at $global_js_temp_directory");</script>';
+				echo '<script>alert("Directory created at ' . $global_js_temp_directory . '");</script>';
 			else:
 				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
@@ -312,22 +344,24 @@ class GlobalJavascript {
 		$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] ) . self::$path;
 		if( !is_dir( $gj_temp_link ) ):
 			if( wp_mkdir_p( $gj_temp_link ) ):
-				echo '<script>alert("Directory created at $global_javascript_upload_dir");</script>';
+				echo '<script>alert("Directory created at ' . $gj_temp_link . '");</script>';
 			else:
 				echo '<script>alert("Error: Cannot create directory");</script>';
 			endif;
 		endif;
 		
-		$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
-		$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . self::$path . '/' . $global_javascript_minified_time .'-global-javascript-minified.js';
-		$global_javascript_actual_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . self::$path . '/global-javascript-actual.js';
+        if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
+		    $global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
+		    $global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . self::$path . '/' . $global_javascript_minified_time .'-global-javascript-minified.js';
+		    $global_javascript_actual_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . self::$path . '/global-javascript-actual.js';
 		
-		if( WP_DEBUG == false ):
-			echo '<script type="text/javascript" src="' . $global_javascript_minified_file . '"></script>' . "\n";
-		else:
-			echo 'You are currently in debug mode...<br/>';
-			echo '<script type="text/javascript" src="' . $global_javascript_actual_file . '"></script>' . "\n";
-		endif;
+		    if( WP_DEBUG == false ):
+		    	echo '<script type="text/javascript" src="' . $global_javascript_minified_file . '"></script>' . "\n";
+	    	else:
+	    		echo 'You are currently in debug mode...<br/>';
+	    		echo '<script type="text/javascript" src="' . $global_javascript_actual_file . '"></script>' . "\n";
+	    	endif;
+        endif;
 	}
 	
 	public function gj_filter( $_content ) {
