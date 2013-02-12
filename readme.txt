@@ -24,6 +24,7 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
+v0.11.1 - added a conditional to only load the javascript if the files exist
 
 v0.11 - added a conditional to check if WP_DEBUG is set to true
         * if WP_DEBUG is true plugin will load the non stripped version of the javascript
