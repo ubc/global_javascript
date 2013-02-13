@@ -65,12 +65,11 @@ class GlobalJavascript {
 	
 	/**
 	 * activate function
-     * fired when the plugin is activated
+     * create the directories that the plugin will be using
      * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
      */
     public function activate( $network_wide ) {
         // TODO: Define activation functionality here
-        // create the necessary folders and files for plugin to work
         $create_upload_dir_path = wp_upload_dir();
 
         // create the directory here
@@ -86,7 +85,7 @@ class GlobalJavascript {
 
     /**
      * deactivate function
-     * fired when the plugin is deactivated
+     * remove the directories and files associated with the plugin
      * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
      */
     public function deactivate( $network_wide ) {
@@ -96,12 +95,11 @@ class GlobalJavascript {
 
     /**
      * uninstall function
-     * fired when plugin is uninstalled
+     * delete the database entries associated to the plugin if any
      * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
      */
     public function unistall( $network_wide ) {
         // TODO: Define uninstall functionality here
-
     }
 
 	/**
