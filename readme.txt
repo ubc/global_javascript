@@ -24,6 +24,8 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
+v0.12 - added 2 additional hooks that will add and delete directories upon activation or deactivation respectively
+
 v0.11.1 - added a conditional to only load the javascript if the files exist
 
 v0.11 - added a conditional to check if WP_DEBUG is set to true
