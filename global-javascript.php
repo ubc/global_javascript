@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.11.1
+Version: 0.12
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -45,8 +45,14 @@ class GlobalJavascript {
 		add_action( 'admin_enqueue_scripts', array( $this, 'register_admin_scripts') );
 		add_action( 'admin_print_styles', array( $this, 'register_admin_styles' ) );
 		
+		// register hooks that are fired when the plugin is activated, deactivated and uninstalled respectively
+		register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+		
+		// load the plugin
 		add_action( 'admin_init', array( $this, 'init' ) );
 		add_action( 'wp_before_admin_bar_render', array( $this, 'admin_bar_render' ) );
+		
 		// Override the edit link, the default link causes a redirect loop
 		add_filter('get_edit_post_link', array( $this, 'revision_post_link' ) );
 		add_action ( 'admin_menu', array( $this, 'gj_menu' ) );
@@ -70,10 +76,10 @@ class GlobalJavascript {
      */
     public function activate( $network_wide ) {
         // TODO: Define activation functionality here
-        $create_upload_dir_path = wp_upload_dir();
+        $upload_dir_path = wp_upload_dir();
 
         // create the directory here
-        $temp_dir_path = trailingslashit( $create_upload_dir_path['basedir'] ) . self::$path;
+        $temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
         if ( !is_dir( $temp_dir_path ) ):
             if ( wp_mkdir_p( $temp_dir_path ) ):
                 echo '<script>alert("Directory created at ' . $temp_dir_path . '");</script>';
@@ -90,7 +96,13 @@ class GlobalJavascript {
      */
     public function deactivate( $network_wide ) {
         // TODO: Define deactivation functionality here
-
+		$upload_dir_path = wp_upload_dir();
+		
+		// delete the directory and its contents here
+		$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
+		if ( is_dir( $temp_dir_path ) ):
+			system( '/bin/rm -rf ' . escapeshellarg( $temp_dir_path ) );
+		endif;
     }
 
     /**
@@ -100,6 +112,18 @@ class GlobalJavascript {
      */
     public function unistall( $network_wide ) {
         // TODO: Define uninstall functionality here
+        /*global $wpdb;
+        $meta_type = 's-global-javascript';
+        $query_plugin_id = "SELECT ID FROM $wpdb->posts WHERE post_type = %s";
+        /** THE FOLLOWING IS INTENDED TO PROTECT QUERIES AGAINST SQL INJECTIONS **/
+        // get the main post id for the plugin
+        /*$plugin_post_id = $wpdb->get_results( $wpdb->prepare( $query_plugin_id, $meta_type ) );
+        // delete the posts with the post_parent equal to $plugin_post_id and the post with $plugin_post_id
+        $query_plugin_delete_posts = "DELETE FROM $wpdb->posts WHERE post_parent = %d";
+        // execute the delete queries here
+        $wpdb->query( $wpdb->prepare( $query_plugin_delete_posts, $plugin_post_id ) );
+        wp_delete_post( $plugin_post_id, true );
+        $wpdb->flush();*/
     }
 
 	/**
@@ -258,13 +282,6 @@ class GlobalJavascript {
 		
 		// do some uploads directory stuff
 		$global_js_temp_directory = trailingslashit( $global_js_upload_directory['basedir'] ) . self::$path;
-		if( !is_dir( $global_js_temp_directory ) ):
-			if( wp_mkdir_p( $global_js_temp_directory ) ):
-				echo '<script>alert("Directory created at ' . $global_js_temp_directory . '");</script>';
-			else:
-				echo '<script>alert("Error: Cannot create directory");</script>';
-			endif;
-		endif;
 
 		$global_js_filename = trailingslashit( $global_js_temp_directory ) . 'global-javascript-actual.js';
 		$global_js_minified = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript-minified.js';
@@ -340,13 +357,6 @@ class GlobalJavascript {
 		$global_javascript_upload_dir = wp_upload_dir();
 		
 		$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] ) . self::$path;
-		if( !is_dir( $gj_temp_link ) ):
-			if( wp_mkdir_p( $gj_temp_link ) ):
-				echo '<script>alert("Directory created at ' . $gj_temp_link . '");</script>';
-			else:
-				echo '<script>alert("Error: Cannot create directory");</script>';
-			endif;
-		endif;
 		
         if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
 		    $global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
