@@ -102,7 +102,7 @@ class GlobalJavascript {
 		$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
 		if ( is_dir( $temp_dir_path ) ):
 			// call recursive function to remove directory and its contents
-            remove_directory( $temp_dir_path );
+            $this->remove_directory( $temp_dir_path );
 		endif;
     }
 
