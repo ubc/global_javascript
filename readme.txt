@@ -24,6 +24,9 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
+v0.13 - changed the behavior of the deactivate function. (does not depend on the host being UNIX based)
+      - added a recursive function that handles removing directories and the contents inside the directories
+
 v0.12 - added 2 additional hooks that will add and delete directories upon activation or deactivation respectively
       - defined the uninstall function though at the moment nothing calls it (need to do additional testing and research before enabling it)
 
