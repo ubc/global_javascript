@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.12
+Version: 0.13
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -101,7 +101,8 @@ class GlobalJavascript {
 		// delete the directory and its contents here
 		$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
 		if ( is_dir( $temp_dir_path ) ):
-			system( '/bin/rm -rf ' . escapeshellarg( $temp_dir_path ) );
+			// call recursive function to remove directory and its contents
+            remove_directory( $temp_dir_path );
 		endif;
     }
 
@@ -514,7 +515,20 @@ Things we encourage include:
 	</div></div>
 	<?php 
 	}
-
+    
+    /**
+     * remove_dir function
+     * private helper function used by the deactivate function
+     * @access private
+     * @param $dir
+     */
+    private function remove_directory( $dir ) {
+        foreach( glob( $dir . '/*' ) as $file ) {
+            if( is_dir( $file ) ) remove_directory( $file ); 
+            else unlink( $file );
+        }
+        rmdir( $dir );
+    }
 }
 
 $global_javascript_init_var = new GlobalJavascript();
