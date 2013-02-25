@@ -322,8 +322,7 @@ class Global_Javascript {
 		if( !is_array($dependency) )
 			$dependency = array();
 		
-		
-		var_dump($dependency);
+	
 		?>
 		
 		<div class="wrap">
