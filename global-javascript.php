@@ -44,6 +44,7 @@ class Global_Javascript {
 		$this->file = plugin_basename( __FILE__ );
 		
 		add_action( 'init', array( $this, 'register_scripts' ) );
+		add_action('wp_footer', array( $this,  'print_scripts' ) );
 		
 	
 		// load the plugin
@@ -61,10 +62,16 @@ class Global_Javascript {
 	}
 	
 	function register_scripts(){
-		
-		wp_register_script( 'global-javascript', plugins_url('my-script.js', __FILE__), array('jquery'), '1.0', true );
+		if( !is_admin() )
+			wp_register_script( 'global-javascript', plugins_url('my-script.js', __FILE__), array('jquery'), '1.0', true );
 	
 	}
+	
+	function print_scripts(){
+		
+		wp_print_scripts('global-javascript');
+	}
+	
 	
 	public function add_menu() {
 	
@@ -217,7 +224,7 @@ class Global_Javascript {
 				// ok lets update the post for real this time
 				$post['post_content'] = $js; // really update the stuff
 				wp_update_post( $post );
-				
+				$post_id = 
 				// time to delete the options that exits
 				delete_option( 'global_js_js' );
 				
@@ -225,7 +232,7 @@ class Global_Javascript {
 				$post_id = wp_insert_post( $post );
 			endif;
 			
-			return true;
+			return $post_id;
 		} // there is a javascript store in the custom post type
 		
 		$safejs_post['post_content'] = $js;
@@ -233,6 +240,12 @@ class Global_Javascript {
 		wp_update_post( $safejs_post );
 		$this->save_to_external_file( $js );
 		return true;
+	}
+	
+	function save_dependency($post_id, $js_dependancies) {
+	
+		add_post_meta($post_id, 'dependency', $js_dependancies, true) or update_post_meta($post_id,'dependency', $js_dependancies);
+	
 	}
 	
 	/**
@@ -305,7 +318,12 @@ class Global_Javascript {
 		$js = $this->get_js();
 		$this->add_metabox($js);
 		
+		$dependency = get_post_meta( $js->ID, 'dependency', true);
+		if( !is_array($dependency) )
+			$dependency = array();
 		
+		
+		var_dump($dependency);
 		?>
 		
 		<div class="wrap">
@@ -323,6 +341,13 @@ class Global_Javascript {
 							<h3><span>Publish</span></h3>
 							<div class="inside">
 								<input class="button-primary" type="submit" name="publish" value="<?php _e( 'Save Javascript' ); ?>" /> 
+							</div>
+						</div>
+						<div class="postbox">
+							<h3><span>Dependency</span></h3>
+							<div class="inside">
+								<label><input type="checkbox" name="dependency[]" value="jquery" <?php checked( in_array('jquery' ,$dependency ), true ); ?> /> jQuery </label>
+								
 							</div>
 						</div>
 						<!-- ... more boxes ... -->
@@ -379,10 +404,12 @@ class Global_Javascript {
 			
 			
 			$js_form = stripslashes ( $_POST ['global-javascript'] );
-			$this->save_revision( $js_form );
+			$post_id = $this->save_revision( $js_form );
 			$js_val[0] = $js_form;
 			$updated = true;
 			$message_number = 1; 
+			
+			$this->save_dependency($post_id, $_POST['dependency']);
 			
 		endif; // end of update  
 			
