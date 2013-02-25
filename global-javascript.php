@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.13
+Version: 0.14
 Author: Julien Law, CTLT
 Author URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Based on the Improved Simpler CSS plugin by CTLT which was forked from Jeremiah Orem's Custom CSS User plugin
@@ -56,7 +56,7 @@ class GlobalJavascript {
 		// Override the edit link, the default link causes a redirect loop
 		add_filter('get_edit_post_link', array( $this, 'revision_post_link' ) );
 		add_action ( 'admin_menu', array( $this, 'gj_menu' ) );
-		add_action ( 'wp_head', array( $this, 'add_js' ) );
+		add_action ( 'wp_footer', array( $this, 'add_js' ) );
 	}
 	 
 	/**
@@ -76,15 +76,16 @@ class GlobalJavascript {
      */
     public function activate( $network_wide ) {
         // TODO: Define activation functionality here
-        $upload_dir_path = wp_upload_dir();
-
-        // create the directory here
-        $temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
-        if ( !is_dir( $temp_dir_path ) ):
-            if ( wp_mkdir_p( $temp_dir_path ) ):
-                echo '<script>alert("Directory created at ' . $temp_dir_path . '");</script>';
-            else:
-                echo '<script>alert("Error: Failed to create directory");</script>';
+        if( !$network_wide ):
+            $upload_dir_path = wp_upload_dir();
+            // create the directory here
+            $temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
+            if( !is_dir( $temp_dir_path ) ):
+                if( wp_mkdir_p( $temp_dir_path ) ):
+                    echo '<script>alert("Directory created at ' . $temp_dir_path . '");</script>';
+                else:
+                    echo '<script>alert("Error: Failed to create directory");</script>';
+                endif;
             endif;
         endif;
     }
@@ -96,14 +97,15 @@ class GlobalJavascript {
      */
     public function deactivate( $network_wide ) {
         // TODO: Define deactivation functionality here
-		$upload_dir_path = wp_upload_dir();
-		
-		// delete the directory and its contents here
-		$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
-		if ( is_dir( $temp_dir_path ) ):
-			// call recursive function to remove directory and its contents
-            $this->remove_directory( $temp_dir_path );
-		endif;
+		if( !$network_wide ):
+            $upload_dir_path = wp_upload_dir();
+		    // delete the directory and its contents here
+		    $temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . self::$path;
+		    if( is_dir( $temp_dir_path ) ):
+			    // call recursive function to remove directory and its contents
+                $this->remove_directory( $temp_dir_path );
+		    endif;
+        endif;
     }
 
     /**
@@ -113,18 +115,20 @@ class GlobalJavascript {
      */
     public function unistall( $network_wide ) {
         // TODO: Define uninstall functionality here
-        /*global $wpdb;
-        $meta_type = 's-global-javascript';
-        $query_plugin_id = "SELECT ID FROM $wpdb->posts WHERE post_type = %s";
-        /** THE FOLLOWING IS INTENDED TO PROTECT QUERIES AGAINST SQL INJECTIONS **/
-        // get the main post id for the plugin
-        /*$plugin_post_id = $wpdb->get_results( $wpdb->prepare( $query_plugin_id, $meta_type ) );
-        // delete the posts with the post_parent equal to $plugin_post_id and the post with $plugin_post_id
-        $query_plugin_delete_posts = "DELETE FROM $wpdb->posts WHERE post_parent = %d";
-        // execute the delete queries here
-        $wpdb->query( $wpdb->prepare( $query_plugin_delete_posts, $plugin_post_id ) );
-        wp_delete_post( $plugin_post_id, true );
-        $wpdb->flush();*/
+        global $wpdb;
+        if( !$network_wide ):
+            $meta_type = 's-global-javascript';
+            $query_plugin_id = "SELECT ID FROM $wpdb->posts WHERE post_type = %s";
+            /** THE FOLLOWING IS INTENDED TO PROTECT QUERIES AGAINST SQL INJECTIONS **/
+            // get the main post id for the plugin
+            $plugin_post_id = $wpdb->get_results( $wpdb->prepare( $query_plugin_id, $meta_type ) );
+            // delete the posts with the post_parent equal to $plugin_post_id and the post with $plugin_post_id
+            $query_plugin_delete_posts = "DELETE FROM $wpdb->posts WHERE post_parent = %d";
+            // execute the delete queries here
+            $wpdb->query( $wpdb->prepare( $query_plugin_delete_posts, $plugin_post_id ) );
+            wp_delete_post( $plugin_post_id, true );
+        endif;
+        $wpdb->flush();
     }
 
 	/**
@@ -365,10 +369,10 @@ class GlobalJavascript {
 		    $global_javascript_actual_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . self::$path . '/global-javascript-actual.js';
 		
 		    if( WP_DEBUG == false ):
-		    	echo '<script type="text/javascript" src="' . $global_javascript_minified_file . '"></script>' . "\n";
+		    	wp_enqueue_script( 'add-minified-js', $global_javascript_minified_file );
 	    	else:
 	    		echo 'You are currently in debug mode...<br/>';
-	    		echo '<script type="text/javascript" src="' . $global_javascript_actual_file . '"></script>' . "\n";
+	    		wp_enqueue_script( 'add-actual-js', $global_javascript_actual_file );
 	    	endif;
         endif;
 	}
