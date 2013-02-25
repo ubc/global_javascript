@@ -24,6 +24,9 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
+v0.14 - updated the javscript enqueuing method to use the WordPress enqueue instead of script tags
+      - the external javascript files are now loaded at the footer instead of the header
+
 v0.13 - changed the behavior of the deactivate function. (does not depend on the host being UNIX based)
       - added a recursive function that handles removing directories and the contents inside the directories
 
