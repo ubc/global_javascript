@@ -243,7 +243,9 @@ class Global_Javascript {
 	}
 	
 	function save_dependency($post_id, $js_dependancies) {
-	
+		
+		
+		
 		add_post_meta($post_id, 'dependency', $js_dependancies, true) or update_post_meta($post_id,'dependency', $js_dependancies);
 	
 	}
@@ -345,7 +347,9 @@ class Global_Javascript {
 						<div class="postbox">
 							<h3><span>Dependency</span></h3>
 							<div class="inside">
-								<label><input type="checkbox" name="dependency[]" value="jquery" <?php checked( in_array('jquery' ,$dependency ), true ); ?> /> jQuery </label>
+								<?php foreach($this->get_all_dependencies() as $dep => $dep_array): ?>
+								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /> <?php echo $dep_array['name']; ?> </label><br />
+								<?php endforeach; ?>
 								
 							</div>
 						</div>
@@ -369,6 +373,13 @@ class Global_Javascript {
 	<?php 
 	}
 	
+	/**
+	 * add_metabox function.
+	 * 
+	 * @access public
+	 * @param mixed $js
+	 * @return void
+	 */
 	function add_metabox($js){
 		
 		if ( 0 < $js['ID'] && wp_get_post_revisions( $js['ID'] ) ) {
@@ -376,6 +387,28 @@ class Global_Javascript {
 			add_meta_box( 'revisionsdiv', __( 'JS Revisions', 'safejs' ), array($this, 'post_revisions_meta_box'), 's-global-javascript', 'normal' );
 			
 		}
+	}
+	
+	/**
+	 * get_all_dependencies function.
+	 * 
+	 * @access public
+	 * @return void
+	 */
+	function get_all_dependencies(){
+	
+		return array( 
+		'jquery' => array(
+			'name'=> 'jQuery',
+		)
+		,'backbone' => array('name' => 'Backbone')
+		,'modernizer' => array(
+			'name'=>'Modernizer',
+			'load_in_head' => true,
+			'url' => ''
+		)
+		);
+		
 	}
 	
 	
@@ -427,7 +460,6 @@ class Global_Javascript {
 			<?php 
 		endif;
 
-	
 	}
     
     /**
