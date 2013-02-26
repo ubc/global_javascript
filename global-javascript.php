@@ -42,9 +42,9 @@ class Global_Javascript {
 		
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
-		
-		add_action( 'init', array( $this, 'register_scripts' ) );
-		add_action('wp_footer', array( $this,  'print_scripts' ) );
+
+		add_action( 'wp_footer', array( $this, 'register_scripts' ) );
+		//add_action('wp_footer', array( $this,  'print_scripts' ) );
 		
 	
 		// load the plugin
@@ -62,9 +62,22 @@ class Global_Javascript {
 	}
 	
 	function register_scripts(){
-		if( !is_admin() )
-			wp_register_script( 'global-javascript', plugins_url('my-script.js', __FILE__), array('jquery'), '1.0', true );
-	
+		if( !is_admin() ) {
+			$global_javascript_upload_dir = wp_upload_dir();
+			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] ) . $this->path;
+			if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
+				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
+				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $this->path . '/' . $global_javascript_minified_time . '-global-javascript.min.js';
+				$global_javascript_actual_file = trailingslashit( $global_javaascript_upload_dir['baseurl'] ) . $this->path . '/global-javascript-actual.js';
+				echo $global_javascript_actual_file;
+				if( WP_DEBUG == false ):
+					wp_enqueue_script( 'add-global-javascript', $global_javascript_minified_file );
+				else:
+					echo 'You are currently in debug mode...<br/>';
+					wp_enqueue_script( 'add-global-javascript', $global_javascript_actual_file );
+				endif;
+			endif;
+		}
 	}
 	
 	function print_scripts(){
@@ -130,16 +143,20 @@ class Global_Javascript {
             $this->remove_directory( $temp_dir_path );
 		endif;
     }
-
-    /**
-     * uninstall function
-     * delete the database entries associated to the plugin if any
-     * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
+    
+ 	/**
+     * remove_dir function
+     * private helper function used by the deactivate function
+     * @access private
+     * @param $dir
      */
-    public function unistall( $network_wide ) {
-    	// we don't do anything on uninstall
+    private function remove_directory( $dir ) {
+        foreach( glob( $dir . '/*' ) as $file ) {
+            if( is_dir( $file ) ) remove_directory( $file ); 
+            else unlink( $file );
+        }
+        rmdir( $dir );
     }
-
 	
 	/**
 	 * revision_post_link function.
@@ -243,9 +260,7 @@ class Global_Javascript {
 	}
 	
 	function save_dependency($post_id, $js_dependancies) {
-		
-		
-		
+	
 		add_post_meta($post_id, 'dependency', $js_dependancies, true) or update_post_meta($post_id,'dependency', $js_dependancies);
 	
 	}
@@ -275,14 +290,13 @@ class Global_Javascript {
 		
 		// do some uploads directory stuff
 		$global_js_temp_directory = trailingslashit( $global_js_upload_directory['basedir'] ) . $this->path;
-
 		$global_js_filename = trailingslashit( $global_js_temp_directory ) . 'global-javascript-actual.js';
-		$global_js_minified = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript-minified.js';
+		$global_js_minified_file = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript.min.js';
 		
 		
 		global $wp_filesystem;
-		// $minified_global_js = $this->filter( $js_to_save );
-		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) || !$wp_filesystem->put_contents( $global_js_minified, $minified_global_js, FS_CHMOD_FILE ) ):
+		$minified_global_js = $this->gj_filter( $js_to_save );
+		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) || !$wp_filesystem->put_contents( $global_js_minified_file, $minified_global_js, FS_CHMOD_FILE ) ):
 			echo '<script>alert("Error saving the file...");</script>';
 		else:
 			
@@ -411,9 +425,6 @@ class Global_Javascript {
 		
 	}
 	
-	
-	
-		
 	function post_revisions_meta_box( $safejs_post ) {
 		
 		// Specify numberposts and ordering args
@@ -462,19 +473,14 @@ class Global_Javascript {
 
 	}
     
-    /**
-     * remove_dir function
-     * private helper function used by the deactivate function
-     * @access private
-     * @param $dir
-     */
-    private function remove_directory( $dir ) {
-        foreach( glob( $dir . '/*' ) as $file ) {
-            if( is_dir( $file ) ) remove_directory( $file ); 
-            else unlink( $file );
-        }
-        rmdir( $dir );
-    }
+    function gj_filter( $_content ) {
+		// remove comments
+		$_content = preg_replace( '/(?<!\S)\/\/\s*[^\r\n]*/', '', $_content);
+		$_content = preg_replace( '!/\*[^*]*\*+([^/][^*]*\*+)*/!' , '', $_content);
+		// remove white space
+		$_return = str_replace( array( "\r\n", "\r", "\n", "\t", '  ', '    ', '    ' ), '', $_content);
+		return $_return;
+	}
 }
 
 
