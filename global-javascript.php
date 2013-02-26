@@ -43,8 +43,8 @@ class Global_Javascript {
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
 
-		add_action( 'wp_footer', array( $this, 'register_scripts' ) );
-		//add_action('wp_footer', array( $this,  'print_scripts' ) );
+		add_action( 'init', array( $this, 'register_scripts' ) );
+		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
 		
 	
 		// load the plugin
@@ -68,21 +68,22 @@ class Global_Javascript {
 			if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $this->path . '/' . $global_javascript_minified_time . '-global-javascript.min.js';
-				$global_javascript_actual_file = trailingslashit( $global_javaascript_upload_dir['baseurl'] ) . $this->path . '/global-javascript-actual.js';
-				echo $global_javascript_actual_file;
+				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $this->path . '/global-javascript-actual.js';
 				if( WP_DEBUG == false ):
-					wp_enqueue_script( 'add-global-javascript', $global_javascript_minified_file );
+					//wp_enqueue_script( 'add-global-javascript', $global_javascript_minified_file );
+					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, null, null, true );
 				else:
 					echo 'You are currently in debug mode...<br/>';
-					wp_enqueue_script( 'add-global-javascript', $global_javascript_actual_file );
+					//wp_enqueue_script( 'add-global-javascript', $global_javascript_actual_file );
+					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, null, null, true );
 				endif;
 			endif;
 		}
 	}
 	
 	function print_scripts(){
-		
-		wp_print_scripts('global-javascript');
+		wp_enqueue_script( 'add-global-javascript' );
+		//wp_print_scripts('add-global-javascript');
 	}
 	
 	
