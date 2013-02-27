@@ -202,6 +202,7 @@ class Global_Javascript {
 			request_file_system_credentials($url, method, true, false, null);
 			return true;
 		}*/
+		WP_Filesystem();
 		
 		$global_js_upload_directory = wp_upload_dir();
 		
