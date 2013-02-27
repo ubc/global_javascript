@@ -34,9 +34,7 @@ class Global_Javascript {
 	public $options = array();
 	
 	public $file;
-	
-	static $gj_count = null;
-	
+		
 	/***************
 	 * Constructor *
 	 ***************/
@@ -44,7 +42,6 @@ class Global_Javascript {
 		
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
-		static::$gj_count = 0;
 
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
@@ -56,7 +53,7 @@ class Global_Javascript {
 		
 		// Override the edit link, the default link causes a redirect loop
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
-
+		//require_once( plugins_url( '/min/lib/Minify/JS/ClosureCompiler.php', __FILE__ ) );
 	}
 	
 	function register_scripts(){
@@ -84,8 +81,9 @@ class Global_Javascript {
 	
 	public function add_menu() {
 	
-		$page =  add_theme_page ( 'Custom Javascript', 'Custom Javascript', 8, __FILE__, array( $this, 'admin_page' ) );
+		$page =  add_theme_page ( 'Global Javascript', 'Global Javascript', 8, __FILE__, array( $this, 'admin_page' ) );
 		add_action('admin_print_scripts-' . $page, array( $this, 'admin_scripts' ) );
+		
 	}
 	 
 	/**
