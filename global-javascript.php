@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.13
+Version: 0.14
 Author: Julien Law, CTLT
 Author URI: https://github.com/ubc/ctlt_wp_global_javascript
 
@@ -35,6 +35,8 @@ class Global_Javascript {
 	
 	public $file;
 	
+	static $gj_count = null;
+	
 	/***************
 	 * Constructor *
 	 ***************/
@@ -42,6 +44,7 @@ class Global_Javascript {
 		
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
+		static::$gj_count = 0;
 
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
@@ -53,28 +56,25 @@ class Global_Javascript {
 		
 		// Override the edit link, the default link causes a redirect loop
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
-	
-		
 		
 		// register hooks that are fired when the plugin is activated, deactivated and uninstalled respectively
-		register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );
+		// not going to do anything on activation and deactivation
+		/*register_activation_hook( __FILE__, array( $this, 'activate' ) );
+		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );*/
 	}
 	
 	function register_scripts(){
 		if( !is_admin() ) {
 			$global_javascript_upload_dir = wp_upload_dir();
-			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] ) . $this->path;
+			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] );
 			if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
-				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $this->path . '/' . $global_javascript_minified_time . '-global-javascript.min.js';
-				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $this->path . '/global-javascript-actual.js';
+				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $global_javascript_minified_time . '-global-javascript-minified.min.js';
+				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
 				if( WP_DEBUG == false ):
-					//wp_enqueue_script( 'add-global-javascript', $global_javascript_minified_file );
 					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, null, null, true );
 				else:
 					echo 'You are currently in debug mode...<br/>';
-					//wp_enqueue_script( 'add-global-javascript', $global_javascript_actual_file );
 					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, null, null, true );
 				endif;
 			endif;
@@ -83,7 +83,6 @@ class Global_Javascript {
 	
 	function print_scripts(){
 		wp_enqueue_script( 'add-global-javascript' );
-		//wp_print_scripts('add-global-javascript');
 	}
 	
 	
@@ -117,33 +116,72 @@ class Global_Javascript {
      * create the directories that the plugin will be using
      * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
      */
-    public function activate( $network_wide ) {
+    /*public function activate() {
         // TODO: Define activation functionality here
-        $upload_dir_path = wp_upload_dir();
-
-        // create the directory here
-        $temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . $this->path;
-        if ( !is_dir( $temp_dir_path ) ):
-            wp_mkdir_p( $temp_dir_path );    
-        endif;
-    }
+		$upload_dir_path = wp_upload_dir();
+		if( !function_exists( 'is_plugin_active_for_network' ) ):
+			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
+		endif;
+        if( !is_plugin_active_for_network( 'global_javascript/global-javascript.php' ) ):
+			// create the directory here
+			$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . $this->path;
+			if( !is_dir( $temp_dir_path ) ):
+				wp_mkdir_p( $temp_dir_path );    
+			endif;
+		else:
+			// mkdir on all the sites if not already there
+			$blog_list = get_blog_list( 0, 'all' );
+			foreach( $blog_list as $blog ) {
+				$temp_dir_path_blog_1 = trailinslashit( $upload_dir_path['basedir'] ) . $this->path;
+				$temp_dir_path_other = trailingslashit( $upload_dir_path['basedir'] ) . 'sites/' . $blog['blog_id'] . '/' . $this->path;
+				if( $blog['blog_id'] != '1' ):
+					if( !is_dir( $temp_dir_path_other ) ):
+						wp_mkdir_p( $temp_dir_path_other );
+					endif;
+				else:
+					if( !is_dir( $temp_dir_path_blog_1 ) ):
+						wp_mkdir_p( $temp_dir_path_blog_1 );
+					endif;
+				endif;
+			}
+		endif;
+    }*/
 
     /**
      * deactivate function
      * remove the directories and files associated with the plugin
      * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
      */
-    public function deactivate( $network_wide ) {
-        // TODO: Define deactivation functionality here
-		$upload_dir_path = wp_upload_dir();
-		
-		// delete the directory and its contents here
-		$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . $this->path;
-		if ( is_dir( $temp_dir_path ) ):
-			// call recursive function to remove directory and its contents
-            $this->remove_directory( $temp_dir_path );
+    /*public function deactivate() {
+        $upload_dir_path = wp_upload_dir();
+        if( !function_exists( 'is_plugin_active_for_network' ) ):
+			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
 		endif;
-    }
+		$network_wide = is_plugin_active_for_network( 'global_javascript/global_javascript.php' );
+		if( !$network_wide ):
+			// delete the directory and its contents here
+			$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] );
+			if ( is_dir( $temp_dir_path ) ):
+				// call recursive function to remove directory and its contents
+				$this->remove_files( $temp_dir_path );
+			endif;
+		else:
+			$blog_list = get_blog_list( 0, 'all' );
+			foreach( $blog_list as $blog ) {
+				if( $blog['blog_id'] !== '1' ):
+					$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] );
+					if( is_dir( $temp_dir_path ) ):
+						$this->remove_files( $temp_dir_path );
+					endif;
+				else:
+					$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . 'sites/' . $blog['blog_id'];
+					if( is_dir( $temp_dir_path ) ):
+						$this->remove_files( $temp_dir_path );
+					endif;
+				endif;
+			}
+		endif;
+    }*/
     
  	/**
      * remove_dir function
@@ -151,13 +189,12 @@ class Global_Javascript {
      * @access private
      * @param $dir
      */
-    private function remove_directory( $dir ) {
-        foreach( glob( $dir . '/*' ) as $file ) {
-            if( is_dir( $file ) ) remove_directory( $file ); 
-            else unlink( $file );
+    /*private function remove_files( $dir ) {
+        foreach( glob( $dir . '/*global-javascript-*.js' ) as $file ) {
+            unlink( $file );
         }
-        rmdir( $dir );
-    }
+    	//rmdir( $dir );
+    }*/
 	
 	/**
 	 * revision_post_link function.
@@ -218,37 +255,7 @@ class Global_Javascript {
 			$post['post_status']  = 'publish';
 			$post['post_type']    = 's-global-javascript';
 			
-			// check if there are any settings data 
-			$global_js_js = get_option ( 'global_js_js' );
-			if( $global_js_js ): // option settings exist 
-				if( !is_array( $global_js_js ) )
-					$global_js_js = array( $global_js_js );
-				
-				array_reverse( $global_js_js );
-				$count = 0;
-				foreach( $global_js_js  as $js_from_option ):
-					$post['post_content'] = $js_from_option;
-					if($count == 0):
-						$post_id = wp_insert_post( $post );
-					else:	
-						$post['ID'] = $post_id;
-						wp_update_post( $post );
-					endif;
-					
-					
-					$count++; // increment the count 
-				endforeach;
-				
-				// ok lets update the post for real this time
-				$post['post_content'] = $js; // really update the stuff
-				wp_update_post( $post );
-				$post_id = 
-				// time to delete the options that exits
-				delete_option( 'global_js_js' );
-				
-			else: // there is no settins data lets save this stuff
-				$post_id = wp_insert_post( $post );
-			endif;
+			$post_id = wp_insert_post( $post );
 			
 			return $post_id;
 		} // there is a javascript store in the custom post type
@@ -290,9 +297,9 @@ class Global_Javascript {
 		$global_js_upload_directory = wp_upload_dir();
 		
 		// do some uploads directory stuff
-		$global_js_temp_directory = trailingslashit( $global_js_upload_directory['basedir'] ) . $this->path;
+		$global_js_temp_directory = $global_js_upload_directory['basedir'];
 		$global_js_filename = trailingslashit( $global_js_temp_directory ) . 'global-javascript-actual.js';
-		$global_js_minified_file = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript.min.js';
+		$global_js_minified_file = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript-minified.min.js';
 		
 		
 		global $wp_filesystem;
@@ -300,12 +307,14 @@ class Global_Javascript {
 		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) || !$wp_filesystem->put_contents( $global_js_minified_file, $minified_global_js, FS_CHMOD_FILE ) ):
 			echo '<script>alert("Error saving the file...");</script>';
 		else:
-			
-			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) . $this->path ) ):
+			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
 				$global_js_newest_filetime = filemtime( $global_js_temp_directory . '/global-javascript-actual.js' );
+				//echo $global_js_newest_filetime . '<br/>';
 				while( false !== ( $global_js_files = readdir( $global_js_handle ) ) ):
 					$global_js_filelastcreated = filemtime( $global_js_temp_directory . '/' . $global_js_files );
-					if( $global_js_filelastcreated < $global_js_newest_filetime ):
+					//echo $global_js_files . '<br/>';
+					if( $global_js_filelastcreated < $global_js_newest_filetime && preg_match( '/-global-javascript-minified.min.js/i', $global_js_files ) ):
+						//echo $global_js_files . '<br/>';
 						unlink( $global_js_temp_directory . '/' . $global_js_files );
 					endif;
 				endwhile;
