@@ -24,6 +24,10 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
+v0.14 - plugin no longer does anything on activation and deactivation (not necessary to)
+      - no longer creates a separate directory
+      - changed the way older files are deleted
+
 v0.13 - changed the behavior of the deactivate function. (does not depend on the host being UNIX based)
       - added a recursive function that handles removing directories and the contents inside the directories
 
