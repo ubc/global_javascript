@@ -189,7 +189,7 @@ class Global_Javascript {
 	 * @return void
 	 */
 	private function save_to_external_file( $js_to_save ) {
-		$url = wp_nonce_url('themes.php?page=' . $this->path);
+		/*$url = wp_nonce_url('themes.php?page=' . $this->path);
 		$method = '';
 		if ( false === ($creds = request_filesystem_credentials($url, $method, false, false, null ) ) ) {
 			// don't have credentials yet
@@ -201,7 +201,7 @@ class Global_Javascript {
 			//creds no good, ask user for them again
 			request_file_system_credentials($url, method, true, false, null);
 			return true;
-		}
+		}*/
 		
 		$global_js_upload_directory = wp_upload_dir();
 		
