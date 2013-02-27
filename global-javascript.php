@@ -56,11 +56,7 @@ class Global_Javascript {
 		
 		// Override the edit link, the default link causes a redirect loop
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
-		
-		// register hooks that are fired when the plugin is activated, deactivated and uninstalled respectively
-		// not going to do anything on activation and deactivation
-		/*register_activation_hook( __FILE__, array( $this, 'activate' ) );
-		register_deactivation_hook( __FILE__, array( $this, 'deactivate' ) );*/
+
 	}
 	
 	function register_scripts(){
@@ -110,91 +106,6 @@ class Global_Javascript {
 		
 		
 	}
-	
-	/**
-	 * activate function
-     * create the directories that the plugin will be using
-     * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
-     */
-    /*public function activate() {
-        // TODO: Define activation functionality here
-		$upload_dir_path = wp_upload_dir();
-		if( !function_exists( 'is_plugin_active_for_network' ) ):
-			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-		endif;
-        if( !is_plugin_active_for_network( 'global_javascript/global-javascript.php' ) ):
-			// create the directory here
-			$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . $this->path;
-			if( !is_dir( $temp_dir_path ) ):
-				wp_mkdir_p( $temp_dir_path );    
-			endif;
-		else:
-			// mkdir on all the sites if not already there
-			$blog_list = get_blog_list( 0, 'all' );
-			foreach( $blog_list as $blog ) {
-				$temp_dir_path_blog_1 = trailinslashit( $upload_dir_path['basedir'] ) . $this->path;
-				$temp_dir_path_other = trailingslashit( $upload_dir_path['basedir'] ) . 'sites/' . $blog['blog_id'] . '/' . $this->path;
-				if( $blog['blog_id'] != '1' ):
-					if( !is_dir( $temp_dir_path_other ) ):
-						wp_mkdir_p( $temp_dir_path_other );
-					endif;
-				else:
-					if( !is_dir( $temp_dir_path_blog_1 ) ):
-						wp_mkdir_p( $temp_dir_path_blog_1 );
-					endif;
-				endif;
-			}
-		endif;
-    }*/
-
-    /**
-     * deactivate function
-     * remove the directories and files associated with the plugin
-     * @param boolean $network_wide True if WPMU superadmin uses "Network Activate" action, false if WPMU is disabled or plugin is activated on an individual blog
-     */
-    /*public function deactivate() {
-        $upload_dir_path = wp_upload_dir();
-        if( !function_exists( 'is_plugin_active_for_network' ) ):
-			require_once( ABSPATH . '/wp-admin/includes/plugin.php' );
-		endif;
-		$network_wide = is_plugin_active_for_network( 'global_javascript/global_javascript.php' );
-		if( !$network_wide ):
-			// delete the directory and its contents here
-			$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] );
-			if ( is_dir( $temp_dir_path ) ):
-				// call recursive function to remove directory and its contents
-				$this->remove_files( $temp_dir_path );
-			endif;
-		else:
-			$blog_list = get_blog_list( 0, 'all' );
-			foreach( $blog_list as $blog ) {
-				if( $blog['blog_id'] !== '1' ):
-					$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] );
-					if( is_dir( $temp_dir_path ) ):
-						$this->remove_files( $temp_dir_path );
-					endif;
-				else:
-					$temp_dir_path = trailingslashit( $upload_dir_path['basedir'] ) . 'sites/' . $blog['blog_id'];
-					if( is_dir( $temp_dir_path ) ):
-						$this->remove_files( $temp_dir_path );
-					endif;
-				endif;
-			}
-		endif;
-    }*/
-    
- 	/**
-     * remove_dir function
-     * private helper function used by the deactivate function
-     * @access private
-     * @param $dir
-     */
-    /*private function remove_files( $dir ) {
-        foreach( glob( $dir . '/*global-javascript-*.js' ) as $file ) {
-            unlink( $file );
-        }
-    	//rmdir( $dir );
-    }*/
 	
 	/**
 	 * revision_post_link function.
