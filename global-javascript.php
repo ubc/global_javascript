@@ -42,6 +42,8 @@ class Global_Javascript {
 		
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
+		
+		echo plugins_url( __FILE__ ) . '<br/>';
 
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
@@ -54,6 +56,9 @@ class Global_Javascript {
 		// Override the edit link, the default link causes a redirect loop
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
 		//require_once( plugins_url( '/min/lib/Minify/JS/ClosureCompiler.php', __FILE__ ) );
+		
+		$somedummypath = wp_upload_dir();
+		echo $somedummypath['basedir'] . '<br/>';
 	}
 	
 	function register_scripts(){
