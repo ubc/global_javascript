@@ -214,8 +214,8 @@ class Global_Javascript {
 		
 		global $wp_filesystem;
 		$minified_global_js = $this->gj_filter( $js_to_save );
-		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_FILE ) || !$wp_filesystem->put_contents( $global_js_minified_file, $minified_global_js, FS_CHMOD_FILE ) ):
-			echo '<script>alert("Error saving the file...");</script>';
+		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save, FS_CHMOD_DIR ) || !$wp_filesystem->put_contents( $global_js_minified_file, $minified_global_js, FS_CHMOD_DIR ) ):
+			return new WP_Error( 'writing_error', 'Error when writing file'); // return an error upon failure
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
 				$global_js_newest_filetime = filemtime( $global_js_temp_directory . '/global-javascript-actual.js' );
