@@ -214,7 +214,7 @@ class Global_Javascript {
 		
 		global $wp_filesystem;
 		$minified_global_js = $this->gj_filter( $js_to_save );
-		if ( !file_put_contents( $global_js_filename, $js_to_save, FS_CHMOD_DIR ) || !file_put_contents( $global_js_minified_file, $minified_global_js, FS_CHMOD_DIR ) ):
+		if ( !file_put_contents( $global_js_filename, $js_to_save ) || !file_put_contents( $global_js_minified_file, $minified_global_js ) ):
 			echo "Error in uploading"; // return an error upon failure
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
