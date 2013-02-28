@@ -69,7 +69,7 @@ class Global_Javascript {
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $global_javascript_minified_time . '-global-javascript-minified.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
-				if( WP_DEBUG == true ):
+				if( WP_DEBUG == false ):
 					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, null, null, true );
 				else:
 					echo 'You are currently in debug mode...<br/>';
@@ -219,7 +219,7 @@ class Global_Javascript {
 		
 		global $wp_filesystem;
 		$minified_global_js = $this->gj_filter( $js_to_save );
-		if ( !file_put_contents( $global_js_filename, $js_to_save ) || !file_put_contents( $global_js_minified_file, $minified_global_js ) ):
+		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save ) || !$wp_filesystem->put_contents( $global_js_minified_file, $minified_global_js ) ):
 			echo "Error in uploading"; // return an error upon failure
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
@@ -269,7 +269,7 @@ class Global_Javascript {
 		<div class="wrap">
 		
 			<div id="icon-themes" class="icon32"></div>
-			<h2>Custom Javascript</h2>
+			<h2>Global Javascript Editor</h2>
 			
 			<form action="themes.php?page=<?php echo  $this->file; ?>" method="post" id="global-javascript-form" >
 				<?php wp_nonce_field( 'update_global_js_js','update_global_js_js_field' ); ?>
