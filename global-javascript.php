@@ -43,7 +43,7 @@ class Global_Javascript {
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
 		
-		echo plugins_url( __FILE__ ) . '<br/>';
+		//echo plugins_url( __FILE__ ) . '<br/>';
 
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
@@ -57,8 +57,8 @@ class Global_Javascript {
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
 		//require_once( plugins_url( '/min/lib/Minify/JS/ClosureCompiler.php', __FILE__ ) );
 		
-		$somedummypath = wp_upload_dir();
-		echo $somedummypath['basedir'] . '<br/>';
+		//$somedummypath = wp_upload_dir();
+		//echo $somedummypath['basedir'] . '<br/>';
 	}
 	
 	function register_scripts(){
@@ -69,7 +69,7 @@ class Global_Javascript {
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $global_javascript_minified_time . '-global-javascript-minified.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
-				if( WP_DEBUG == false ):
+				if( WP_DEBUG == true ):
 					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, null, null, true );
 				else:
 					echo 'You are currently in debug mode...<br/>';
