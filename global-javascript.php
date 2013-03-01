@@ -66,7 +66,7 @@ class Global_Javascript {
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . filemtime( $gj_temp_link . '/global-javascript-actual.js' ) . '-global-javascript.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
-				if( WP_DEBUG == true ):
+				if( WP_DEBUG == false ):
 					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, null, null, true );
 				else:
 					echo 'You are currently in debug mode...<br/>';
