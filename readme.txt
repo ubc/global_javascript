@@ -3,13 +3,22 @@
 Contributors: psmagicman (Julien Law), ctlt-dev, ubcdev
 Donate link:
 Tags: plugin, javascript, editor, ubc, appearance, global, js, dynamic
-Requires at least: 3.5
+Requires at least: WordPress 3.5 and PHP 5.2.1
 Tested up to: 3.5
 Stable tag:
 License: GNU General Public License
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 A simple Javascript writing/editing tool
+
+=== Acknowledgements ===
+
+This plugin uses the minify library package by Steve Clay (steve@mrclay.org) and Ryan Grove (ryan@wonko.com).
+More info at http://code.google.com/p/minify/
+
+The specific minifying tool that the plugin uses is the Closure Compiler by Google.
+More info at https:://developers.google.com/closure/
+You can find a live demo of the tool at closure-compiler.appspot.com/home
 
 === Description ===
 
