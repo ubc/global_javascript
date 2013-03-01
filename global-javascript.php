@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.15
+Version: 0.16
 Author: Julien Law, CTLT
 Author URI: https://github.com/ubc/ctlt_wp_global_javascript
 
@@ -52,10 +52,10 @@ class Global_Javascript {
 		
 		// Override the edit link, the default link causes a redirect loop
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
+		
 	}
 	
 	function register_scripts(){
-		$dep_array = array();
 		if( !is_admin() ) {
 			$global_javascript_upload_dir = wp_upload_dir();
 			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] );
@@ -64,16 +64,27 @@ class Global_Javascript {
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . filemtime( $gj_temp_link . '/global-javascript-actual.js' ) . '-global-javascript.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
 				if( WP_DEBUG == false ):
-					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, $dep_array, null, true );
+					wp_register_script( 'add-global-javascript', $global_javascript_minified_file );
 				else:
 					echo 'You are currently in debug mode...<br/>';
-					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, $dep_array, null, true );
+					wp_register_script( 'add-global-javascript', $global_javascript_actual_file );
 				endif;
 			endif;
 		}
 	}
 	
 	function print_scripts(){
+		// get post ID
+		$post_id = $this->get_plugin_post_id();
+		// grab the list of dependencies from the db here
+		if( $post_id ):
+			$dependencies = $this->get_saved_dependencies( $post_id );
+		else:
+			$dependencies = null;
+		endif;
+		foreach( $dependencies as $dependency ):
+			wp_enqueue_script( $dependency );
+		endforeach;
 		wp_enqueue_script( 'add-global-javascript' );
 	}
 	
@@ -229,20 +240,33 @@ class Global_Javascript {
 			$safejs_post = get_object_vars( $a );
 		else
 			$safejs_post = false;
-	
 		return $safejs_post;
 	}
+	
+	/**
+	 * get_plugin_post_id function
+	 * Gets the post id from posts table
+	 * @access public
+	 * @return $post_id
+	 */
+	public function get_plugin_post_id() {
+		if( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ) ):
+			$post_row = get_object_vars( $a );
+			$post_id = $post_row['ID'];
+		else:
+			$post_id = false;
+		endif;
+		return $post_id;
+	}
+	 
 	
 	public function admin_page() { 
 		$this->update_js();
 		$js = $this->get_js();
 		$this->add_metabox($js);
-		echo $js['ID'] . '<br/>';
-		$dependency = get_post_meta( $js['ID'] );
-		var_dump( $dependency );
+		$dependency = get_post_meta( $js['ID'], 'dependency', true );
 		if( !is_array( $dependency ) )
 			$dependency = array();
-		
 	
 		?>
 		
@@ -316,18 +340,42 @@ class Global_Javascript {
 	function get_all_dependencies(){
 	
 		return array( 
+		'backbone' => array(
+			'name' => 'Backbone js',
+			'load_in_head' => true
+			),
 		'jquery' => array(
 			'name'=> 'jQuery',
-			'load_in_head' => true,
-		)
-		,'backbone' => array('name' => 'Backbone')
-		,'modernizer' => array(
-			'name'=>'Modernizer',
-			'load_in_head' => true,
-			'url' => ''
-		)
+			'load_in_head' => true
+			),
+		'jquery-ui-autocomplete' => array(
+			'name' => 'jQuery UI Autocomplete',
+			'load_in_head' => true
+			),
+		'json2' => array(
+			'name' => 'JSON for JS',
+			'load_in_head' => true
+			),
+		'underscore' => array(
+			'name'=> 'Underscore js',
+			'load_in_head' => true
+			)
 		);
 		
+	}
+	
+	/**
+	 * get_saved_dependencies function
+	 * 
+	 * @access public
+	 * @param $post_id
+	 * @return $dependency_arr
+	 */
+	function get_saved_dependencies( $post_id ) {
+	 	$dependency_arr = get_post_meta( $post_id, 'dependency', true );
+	 	if( !is_array( $dependency_arr ) )
+	 		$dependency_arr = array();
+	 	return $dependency_arr;
 	}
 	
 	function post_revisions_meta_box( $safejs_post ) {
@@ -355,7 +403,6 @@ class Global_Javascript {
 			$updated = true;
 			$message_number = 1; 
 			
-			echo 'after saving: ' . $post_id . '<br/>';
 			$this->save_dependency( $post_id, $_POST['dependency'] );
 		endif; // end of update  
 			
