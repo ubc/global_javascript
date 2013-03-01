@@ -24,6 +24,10 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
+v0.15 - plugin now minifies the javascript using the Google Closure Compiler at simple settings included in the PHP minifier library
+        * Julien's note: if you want to change which minifier to use go to the filter function in the code
+      - changed the way files are saved and loaded to account for the extra time to minify the javascript
+
 v0.14 - plugin no longer does anything on activation and deactivation (not necessary to)
       - no longer creates a separate directory
       - changed the way older files are deleted
