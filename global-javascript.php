@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.14
+Version: 0.15
 Author: Julien Law, CTLT
 Author URI: https://github.com/ubc/ctlt_wp_global_javascript
 
@@ -45,6 +45,7 @@ class Global_Javascript {
 		
 		//echo plugins_url( __FILE__ ) . '<br/>';
 
+
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
 		
@@ -55,10 +56,6 @@ class Global_Javascript {
 		
 		// Override the edit link, the default link causes a redirect loop
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
-		//require_once( plugins_url( '/min/lib/Minify/JS/ClosureCompiler.php', __FILE__ ) );
-		
-		//$somedummypath = wp_upload_dir();
-		//echo $somedummypath['basedir'] . '<br/>';
 	}
 	
 	function register_scripts(){
@@ -67,7 +64,7 @@ class Global_Javascript {
 			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] );
 			if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
-				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . $global_javascript_minified_time . '-global-javascript-minified.min.js';
+				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . filemtime( $gj_temp_link . '/global-javascript-actual.js' ) . '-global-javascript.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
 				if( WP_DEBUG == false ):
 					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, null, null, true );
@@ -83,12 +80,9 @@ class Global_Javascript {
 		wp_enqueue_script( 'add-global-javascript' );
 	}
 	
-	
 	public function add_menu() {
-	
 		$page =  add_theme_page ( 'Global Javascript', 'Global Javascript', 8, __FILE__, array( $this, 'admin_page' ) );
 		add_action('admin_print_scripts-' . $page, array( $this, 'admin_scripts' ) );
-		
 	}
 	 
 	/**
@@ -194,19 +188,8 @@ class Global_Javascript {
 	 * @return void
 	 */
 	private function save_to_external_file( $js_to_save ) {
-		/*$url = wp_nonce_url('themes.php?page=' . $this->path);
-		$method = '';
-		if ( false === ($creds = request_filesystem_credentials($url, $method, false, false, null ) ) ) {
-			// don't have credentials yet
-			// so stop processing
-			return true;
-		}
-		// got the creds
-		if ( !WP_Filesystem($creds) ) {
-			//creds no good, ask user for them again
-			request_file_system_credentials($url, method, true, false, null);
-			return true;
-		}*/
+		// lets minify the javascript to save first to solve timing issues
+		$minified_global_js = $this->filter( $js_to_save );
 		WP_Filesystem();
 		
 		$global_js_upload_directory = wp_upload_dir();
@@ -214,21 +197,19 @@ class Global_Javascript {
 		// do some uploads directory stuff
 		$global_js_temp_directory = $global_js_upload_directory['basedir'];
 		$global_js_filename = trailingslashit( $global_js_temp_directory ) . 'global-javascript-actual.js';
-		$global_js_minified_file = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript-minified.min.js';
-		
+		$global_js_minified_file = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript.min.js';
 		
 		global $wp_filesystem;
-		$minified_global_js = $this->gj_filter( $js_to_save );
 		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save ) || !$wp_filesystem->put_contents( $global_js_minified_file, $minified_global_js ) ):
 			echo "Error in uploading"; // return an error upon failure
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
-				$global_js_newest_filetime = filemtime( $global_js_temp_directory . '/global-javascript-actual.js' );
+				$global_js_newest_filetime = filemtime( $global_js_filename );
 				//echo $global_js_newest_filetime . '<br/>';
 				while( false !== ( $global_js_files = readdir( $global_js_handle ) ) ):
 					$global_js_filelastcreated = filemtime( $global_js_temp_directory . '/' . $global_js_files );
 					//echo $global_js_files . '<br/>';
-					if( $global_js_filelastcreated < $global_js_newest_filetime && preg_match( '/-global-javascript-minified.min.js/i', $global_js_files ) ):
+					if( $global_js_filelastcreated < $global_js_newest_filetime && preg_match( '/-global-javascript.min.js/i', $global_js_files ) ):
 						//echo $global_js_files . '<br/>';
 						unlink( $global_js_temp_directory . '/' . $global_js_files );
 					endif;
@@ -398,15 +379,10 @@ class Global_Javascript {
 
 	}
     
-    function gj_filter( $_content ) {
-		// remove comments
-		$_content = preg_replace( '/(?<!\S)\/\/\s*[^\r\n]*/', '', $_content);
-		$_content = preg_replace( '!/\*[^*]*\*+([^/][^*]*\*+)*/!' , '', $_content);
-		// remove white space
-		$_return = str_replace( array( "\r\n", "\r", "\n", "\t", '  ', '    ', '    ' ), '', $_content);
+    function filter( $_content ) {
+		require_once ( 'min/lib/Minify/JS/ClosureCompiler.php' );
+		$_return = Minify_JS_ClosureCompiler::minify( $_content, array( 'compilation_level' => 'SIMPLE_OPTIMIZATIONS' ) );
 		return $_return;
 	}
 }
-
-
 $global_javascript_object = new Global_Javascript();
