@@ -199,8 +199,8 @@ class Global_Javascript {
 		$global_js_filename = trailingslashit( $global_js_temp_directory ) . 'global-javascript-actual.js';
 		$global_js_minified_file = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript.min.js';
 		
-		global $wp_filesystem;
-		if ( !$wp_filesystem->put_contents( $global_js_filename, $js_to_save ) || !$wp_filesystem->put_contents( $global_js_minified_file, $minified_global_js ) ):
+		//global $wp_filesystem;
+		if ( !file_put_contents( $global_js_filename, $js_to_save ) || !file_put_contents( $global_js_minified_file, $minified_global_js ) ):
 			echo "Error in uploading"; // return an error upon failure
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
