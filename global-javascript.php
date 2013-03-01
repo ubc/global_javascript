@@ -31,7 +31,7 @@ class Global_Javascript {
 	
 	public $path = null;
 	
-	public $options = array();
+	public $option = array();
 	
 	public $file;
 		
@@ -42,14 +42,10 @@ class Global_Javascript {
 		
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
-		
-		//echo plugins_url( __FILE__ ) . '<br/>';
-
 
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
 		
-	
 		// load the plugin
 		add_action( 'admin_init', array( $this, 'init' ) );
 		add_action( 'admin_menu', array( $this, 'add_menu' ) );
@@ -59,6 +55,7 @@ class Global_Javascript {
 	}
 	
 	function register_scripts(){
+		$dep_array = array();
 		if( !is_admin() ) {
 			$global_javascript_upload_dir = wp_upload_dir();
 			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] );
@@ -67,10 +64,10 @@ class Global_Javascript {
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . filemtime( $gj_temp_link . '/global-javascript-actual.js' ) . '-global-javascript.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
 				if( WP_DEBUG == false ):
-					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, null, null, true );
+					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, $dep_array, null, true );
 				else:
 					echo 'You are currently in debug mode...<br/>';
-					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, null, null, true );
+					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, $dep_array, null, true );
 				endif;
 			endif;
 		}
@@ -169,15 +166,15 @@ class Global_Javascript {
 		} // there is a javascript store in the custom post type
 		
 		$safejs_post['post_content'] = $js;
-		
+
 		wp_update_post( $safejs_post );
 		$this->save_to_external_file( $js );
-		return true;
+		return $safejs_post['ID'];
 	}
 	
-	function save_dependency($post_id, $js_dependancies) {
-	
-		add_post_meta($post_id, 'dependency', $js_dependancies, true) or update_post_meta($post_id,'dependency', $js_dependancies);
+	function save_dependency($post_id, $js_dependencies) {
+
+		add_post_meta( $post_id, 'dependency', $js_dependencies, true ) or update_post_meta( $post_id, 'dependency', $js_dependencies );
 	
 	}
 	
@@ -205,13 +202,15 @@ class Global_Javascript {
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
 				$global_js_newest_filetime = filemtime( $global_js_filename );
-				//echo $global_js_newest_filetime . '<br/>';
 				while( false !== ( $global_js_files = readdir( $global_js_handle ) ) ):
 					$global_js_filelastcreated = filemtime( $global_js_temp_directory . '/' . $global_js_files );
-					//echo $global_js_files . '<br/>';
-					if( $global_js_filelastcreated < $global_js_newest_filetime && preg_match( '/-global-javascript.min.js/i', $global_js_files ) ):
-						//echo $global_js_files . '<br/>';
+					if( $global_js_filelastcreated < $global_js_newest_filetime && preg_match( '/-global-javascript.min.js/i', $global_js_files ) ): 
+						// comparing the unix timestamp of the files inside the folder and only deleting the ones that are old and have the specific naming structure
 						unlink( $global_js_temp_directory . '/' . $global_js_files );
+						// clear super cache
+						if( function_exists( 'wp_cache_clear_cache' ) ):
+							wp_cache_clear_cache();
+						endif;
 					endif;
 				endwhile;
 				closedir( $global_js_handle );
@@ -226,7 +225,6 @@ class Global_Javascript {
 	 * @return void
 	 */
 	public function get_js() {
-	
 		if ( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ) )
 			$safejs_post = get_object_vars( $a );
 		else
@@ -239,9 +237,10 @@ class Global_Javascript {
 		$this->update_js();
 		$js = $this->get_js();
 		$this->add_metabox($js);
-		
-		$dependency = get_post_meta( $js->ID, 'dependency', true);
-		if( !is_array($dependency) )
+		echo $js['ID'] . '<br/>';
+		$dependency = get_post_meta( $js['ID'] );
+		var_dump( $dependency );
+		if( !is_array( $dependency ) )
 			$dependency = array();
 		
 	
@@ -270,7 +269,6 @@ class Global_Javascript {
 								<?php foreach($this->get_all_dependencies() as $dep => $dep_array): ?>
 								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /> <?php echo $dep_array['name']; ?> </label><br />
 								<?php endforeach; ?>
-								
 							</div>
 						</div>
 						<!-- ... more boxes ... -->
@@ -320,6 +318,7 @@ class Global_Javascript {
 		return array( 
 		'jquery' => array(
 			'name'=> 'jQuery',
+			'load_in_head' => true,
 		)
 		,'backbone' => array('name' => 'Backbone')
 		,'modernizer' => array(
@@ -344,22 +343,20 @@ class Global_Javascript {
 
 	
 	function update_js(){
-		
-		
+	
 		$updated = false;
 		
 		// the form has been submited save the options 
 		if ( !empty( $_POST ) && check_admin_referer( 'update_global_js_js','update_global_js_js_field' ) ):
 			
-			
-			$js_form = stripslashes ( $_POST ['global-javascript'] );
+			$js_form = stripslashes( $_POST ['global-javascript'] );
 			$post_id = $this->save_revision( $js_form );
 			$js_val[0] = $js_form;
 			$updated = true;
 			$message_number = 1; 
 			
-			$this->save_dependency($post_id, $_POST['dependency']);
-			
+			echo 'after saving: ' . $post_id . '<br/>';
+			$this->save_dependency( $post_id, $_POST['dependency'] );
 		endif; // end of update  
 			
 		if( isset( $_GET['message'] ) )
