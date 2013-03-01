@@ -17,8 +17,8 @@ This plugin uses the minify library package by Steve Clay (steve@mrclay.org) and
 More info at http://code.google.com/p/minify/
 
 The specific minifying tool that the plugin uses is the Closure Compiler by Google.
-More info at https:://developers.google.com/closure/
-You can find a live demo of the tool at closure-compiler.appspot.com/home
+More info at https://developers.google.com/closure/
+You can find a live demo of the tool at http://closure-compiler.appspot.com/home
 
 === Description ===
 
