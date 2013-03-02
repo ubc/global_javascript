@@ -291,7 +291,7 @@ class Global_Javascript {
 							<h3><span>Dependency</span></h3>
 							<div class="inside">
 								<?php foreach($this->get_all_dependencies() as $dep => $dep_array): ?>
-								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /> <?php echo $dep_array['name']; ?> </label><br />
+								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /><a href="<?php echo $dep_array['url']; ?>"> <?php echo $dep_array['name']; ?> </a></label><br />
 								<?php endforeach; ?>
 							</div>
 						</div>
@@ -342,23 +342,33 @@ class Global_Javascript {
 		return array( 
 		'backbone' => array(
 			'name' => 'Backbone js',
-			'load_in_head' => true
+			'load_in_head' => true,
+			'url' => 'http://backbonejs.com'
 			),
 		'jquery' => array(
 			'name'=> 'jQuery',
-			'load_in_head' => true
+			'load_in_head' => true,
+			'url' => 'http://jquery.com'
 			),
 		'jquery-ui-autocomplete' => array(
 			'name' => 'jQuery UI Autocomplete',
-			'load_in_head' => true
+			'load_in_head' => true,
+			'url' => 'http://jqueryui.com/autocomplete'
 			),
 		'json2' => array(
 			'name' => 'JSON for JS',
-			'load_in_head' => true
+			'load_in_head' => true,
+			'url' => 'https://github.com/douglascrockford/JSON-js'
 			),
+		'thickbox' => array(
+			'name' => 'Thickbox',
+			'load_in_head' => true,
+			'url' => 'http://www.thickbox.net'
+		),
 		'underscore' => array(
 			'name'=> 'Underscore js',
-			'load_in_head' => true
+			'load_in_head' => true,
+			'url' => 'http://underscorejs.org'
 			)
 		);
 		
