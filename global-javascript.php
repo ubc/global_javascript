@@ -60,14 +60,25 @@ class Global_Javascript {
 			$global_javascript_upload_dir = wp_upload_dir();
 			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] );
 			if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
+				$post_id = $this->get_plugin_post_id();
+			// grab the list of dependencies from the db here
+			if( $post_id ):
+				$dependencies = $this->get_saved_dependencies( $post_id );
+			else:
+				$dependencies = array();
+			endif;
+			var_dump( $dependencies );
+			/*foreach( $dependencies as $dependency ):
+				wp_enqueue_script( $dependency );
+			endforeach;*/
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . filemtime( $gj_temp_link . '/global-javascript-actual.js' ) . '-global-javascript.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
 				if( WP_DEBUG == false ):
-					wp_register_script( 'add-global-javascript', $global_javascript_minified_file );
+					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, $dependencies, '1.0', true );
 				else:
 					echo 'You are currently in debug mode...<br/>';
-					wp_register_script( 'add-global-javascript', $global_javascript_actual_file );
+					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, $dependencies, '1.0', true );
 				endif;
 			endif;
 		}
@@ -75,7 +86,7 @@ class Global_Javascript {
 	
 	function print_scripts(){
 		// get post ID
-		$post_id = $this->get_plugin_post_id();
+		/*$post_id = $this->get_plugin_post_id();
 		// grab the list of dependencies from the db here
 		if( $post_id ):
 			$dependencies = $this->get_saved_dependencies( $post_id );
@@ -84,7 +95,7 @@ class Global_Javascript {
 		endif;
 		foreach( $dependencies as $dependency ):
 			wp_enqueue_script( $dependency );
-		endforeach;
+		endforeach;*/
 		wp_enqueue_script( 'add-global-javascript' );
 	}
 	
