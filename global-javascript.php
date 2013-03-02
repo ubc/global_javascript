@@ -62,15 +62,25 @@ class Global_Javascript {
 			if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
 				$post_id = $this->get_plugin_post_id();
 			// grab the list of dependencies from the db here
+				$all_deps = $this->get_all_dependencies();
 			if( $post_id ):
 				$dependencies = $this->get_saved_dependencies( $post_id );
+				foreach($dependencies as $dep):
+					if(isset($all_deps[$dep]['url'] ) ):
+					wp_register_script($dep, 
+					plugins_url(trailingslashit($this->path) . $all_deps[$dep]['url']), 
+					array(), 
+					'1.0', 
+					!$all_deps[$dep]['load_in_head']);
+						if($all_deps[$dep]['load_in_head']):
+							wp_enqueue_script( $dep);
+						endif;	
+					endif;
+				endforeach;
 			else:
 				$dependencies = array();
 			endif;
-			var_dump( $dependencies );
-			/*foreach( $dependencies as $dependency ):
-				wp_enqueue_script( $dependency );
-			endforeach;*/
+				
 				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
 				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . filemtime( $gj_temp_link . '/global-javascript-actual.js' ) . '-global-javascript.min.js';
 				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
@@ -85,17 +95,7 @@ class Global_Javascript {
 	}
 	
 	function print_scripts(){
-		// get post ID
-		/*$post_id = $this->get_plugin_post_id();
-		// grab the list of dependencies from the db here
-		if( $post_id ):
-			$dependencies = $this->get_saved_dependencies( $post_id );
-		else:
-			$dependencies = null;
-		endif;
-		foreach( $dependencies as $dependency ):
-			wp_enqueue_script( $dependency );
-		endforeach;*/
+		
 		wp_enqueue_script( 'add-global-javascript' );
 	}
 	
@@ -302,7 +302,7 @@ class Global_Javascript {
 							<h3><span>Dependency</span></h3>
 							<div class="inside">
 								<?php foreach($this->get_all_dependencies() as $dep => $dep_array): ?>
-								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /><a href="<?php echo $dep_array['url']; ?>"> <?php echo $dep_array['name']; ?> </a></label><br />
+								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /><a href="<?php echo $dep_array['infourl']; ?>"> <?php echo $dep_array['name']; ?> </a></label><br />
 								<?php endforeach; ?>
 							</div>
 						</div>
@@ -349,37 +349,43 @@ class Global_Javascript {
 	 * @return void
 	 */
 	function get_all_dependencies(){
-	
+		
 		return array( 
 		'backbone' => array(
 			'name' => 'Backbone js',
-			'load_in_head' => true,
-			'url' => 'http://backbonejs.com'
+			'load_in_head' => false,
+			'infourl' => 'http://backbonejs.com'
 			),
 		'jquery' => array(
 			'name'=> 'jQuery',
-			'load_in_head' => true,
-			'url' => 'http://jquery.com'
+			'load_in_head' => false,
+			'infourl' => 'http://jquery.com'
 			),
 		'jquery-ui-autocomplete' => array(
 			'name' => 'jQuery UI Autocomplete',
-			'load_in_head' => true,
-			'url' => 'http://jqueryui.com/autocomplete'
+			'load_in_head' => false,
+			'infourl' => 'http://jqueryui.com/autocomplete'
 			),
 		'json2' => array(
 			'name' => 'JSON for JS',
-			'load_in_head' => true,
-			'url' => 'https://github.com/douglascrockford/JSON-js'
+			'load_in_head' => false,
+			'infourl' => 'https://github.com/douglascrockford/JSON-js'
 			),
+		'modernizer' => array(
+			'name' => 'Modernizr',
+			'load_in_head' => true,
+			'url' => 'js/dependencies/modernizer.min.js',
+			'infourl' => 'http://modernizr.com'
+		),
 		'thickbox' => array(
 			'name' => 'Thickbox',
-			'load_in_head' => true,
-			'url' => 'http://www.thickbox.net'
+			'load_in_head' => false,
+			'infourl' => 'http://www.thickbox.net'
 		),
 		'underscore' => array(
 			'name'=> 'Underscore js',
-			'load_in_head' => true,
-			'url' => 'http://underscorejs.org'
+			'load_in_head' => false,
+			'infourl' => 'http://underscorejs.org'
 			)
 		);
 		
@@ -445,8 +451,10 @@ class Global_Javascript {
 	}
     
     function filter( $_content ) {
-		require_once ( 'min/lib/Minify/JS/ClosureCompiler.php' );
-		$_return = Minify_JS_ClosureCompiler::minify( $_content, array( 'compilation_level' => 'SIMPLE_OPTIMIZATIONS' ) );
+		/*require_once ( 'min/lib/Minify/JS/ClosureCompiler.php' );
+		$_return = Minify_JS_ClosureCompiler::minify( $_content, array( 'compilation_level' => 'SIMPLE_OPTIMIZATIONS' ) );*/
+		require_once ( 'min/lib/JSMin.php' );
+		$_return = JSMin::minify( $_content );
 		return $_return;
 	}
 }
