@@ -52,7 +52,6 @@ class Global_Javascript {
 		
 		// Override the edit link, the default link causes a redirect loop
 		add_filter( 'get_edit_post_link', array( $this, 'revision_post_link' ) );
-		
 	}
 	
 	function register_scripts(){
@@ -189,7 +188,6 @@ class Global_Javascript {
 		$safejs_post['post_content'] = $js;
 
 		wp_update_post( $safejs_post );
-		$this->save_to_external_file( $js );
 		return $safejs_post['ID'];
 	}
 	
@@ -219,7 +217,7 @@ class Global_Javascript {
 		
 		//global $wp_filesystem;
 		if ( !file_put_contents( $global_js_filename, $js_to_save ) || !file_put_contents( $global_js_minified_file, $minified_global_js ) ):
-			 $this->fail_message(); // return an error upon failure
+			 return 1;  // return an error upon failure
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
 				$global_js_newest_filetime = filemtime( $global_js_filename );
@@ -236,6 +234,7 @@ class Global_Javascript {
 				endwhile;
 				closedir( $global_js_handle );
 			endif;
+			return 0;
 		endif;
 	}
 	
@@ -425,6 +424,7 @@ class Global_Javascript {
 			
 			$js_form = stripslashes( $_POST ['global-javascript'] );
 			$post_id = $this->save_revision( $js_form );
+			$error_id = $this->save_to_external_file( $js_form );
 			$js_val[0] = $js_form;
 			$updated = true;
 			$message_number = 1; 
@@ -434,11 +434,15 @@ class Global_Javascript {
 			
 		if( isset( $_GET['message'] ) )
 			$message_number = (int) $_GET['message'];
-				
+		
+		if( $error_id )
+			$message_number = 3;
+
 		if( $message_number ):
 			
 			$messages['s-global-javascript'] = array(
 			 1 => "Global Javascript Saved to Database",
+			 3 => "Failed to upload Javascript to server",
 			 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Global Javascript restored to revision from %s, <em>Save Changes for the revision to take effect</em>'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false
 			 );
 			 $messages = apply_filters( 'post_updated_messages', $messages );
@@ -446,20 +450,8 @@ class Global_Javascript {
 			<div class="updated"><p><strong><?php echo $messages['s-global-javascript'][$message_number]; ?></strong></p></div>		
 			<?php 
 		endif;
-
+		
 	}
-   
-    /*
-     * fail_message function
-     * called if the javascript file fails to be uploaded to the server
-     * @param void
-     * @return void
-     */
-    function fail_message() {
-        if( user_can( 'manage_options' ) ) {
-            showMessage( 'Error in saving javascript file to server.' );   
-        }
-    }
 
     function filter( $_content ) {
 		/*require_once ( 'min/lib/Minify/JS/ClosureCompiler.php' );
