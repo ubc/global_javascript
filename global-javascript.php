@@ -219,7 +219,7 @@ class Global_Javascript {
 		
 		//global $wp_filesystem;
 		if ( !file_put_contents( $global_js_filename, $js_to_save ) || !file_put_contents( $global_js_minified_file, $minified_global_js ) ):
-			echo "Error in uploading"; // return an error upon failure
+			 $this->fail_message(); // return an error upon failure
 		else:
 			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
 				$global_js_newest_filetime = filemtime( $global_js_filename );
@@ -438,7 +438,7 @@ class Global_Javascript {
 		if( $message_number ):
 			
 			$messages['s-global-javascript'] = array(
-			 1 => "Global Javascript Saved",
+			 1 => "Global Javascript Saved to Database",
 			 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Global Javascript restored to revision from %s, <em>Save Changes for the revision to take effect</em>'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false
 			 );
 			 $messages = apply_filters( 'post_updated_messages', $messages );
@@ -448,7 +448,19 @@ class Global_Javascript {
 		endif;
 
 	}
-    
+   
+    /*
+     * fail_message function
+     * called if the javascript file fails to be uploaded to the server
+     * @param void
+     * @return void
+     */
+    function fail_message() {
+        if( user_can( 'manage_options' ) ) {
+            showMessage( 'Error in saving javascript file to server.' );   
+        }
+    }
+
     function filter( $_content ) {
 		/*require_once ( 'min/lib/Minify/JS/ClosureCompiler.php' );
 		$_return = Minify_JS_ClosureCompiler::minify( $_content, array( 'compilation_level' => 'SIMPLE_OPTIMIZATIONS' ) );*/
