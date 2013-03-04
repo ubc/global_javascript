@@ -3,7 +3,7 @@
 Plugin Name: Global Javascript
 Plugin URI: https://github.com/psmagicman/ctlt_wp_global_javascript
 Description: Allows the creation and editing of Javascript on Wordpress powered sites
-Version: 0.16
+Version: 1.0
 Author: Julien Law, CTLT
 Author URI: https://github.com/ubc/ctlt_wp_global_javascript
 

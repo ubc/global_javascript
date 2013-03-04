@@ -16,10 +16,6 @@ A simple Javascript writing/editing tool
 This plugin uses the minify library package by Steve Clay (steve@mrclay.org) and Ryan Grove (ryan@wonko.com).
 More info at http://code.google.com/p/minify/
 
-The specific minifying tool that the plugin uses is the Closure Compiler by Google.
-More info at https://developers.google.com/closure/
-You can find a live demo of the tool at http://closure-compiler.appspot.com/home
-
 === Description ===
 
 Allows the user to create custom javascript for their Wordpress powered site on a global level.
@@ -33,6 +29,8 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
+v.1.0 - release version
+
 v0.16 - dependencies such as jQuery are now included in the plugin
       - the current libraries can be included by ticking the checkbox in the editor
       - included a function call to clear cache on save if supercache is enabled
