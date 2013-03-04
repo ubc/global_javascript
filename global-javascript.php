@@ -87,7 +87,6 @@ class Global_Javascript {
 				if( WP_DEBUG == false ):
 					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, $dependencies, '1.0', true );
 				else:
-					echo 'You are currently in debug mode...<br/>';
 					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, $dependencies, '1.0', true );
 				endif;
 			endif;
