@@ -441,7 +441,7 @@ class Global_Javascript {
 		if( $message_number ):
 			
 			$messages['s-global-javascript'] = array(
-			 1 => "Global Javascript Saved to Database",
+			 1 => "Global Javascript saved",
 			 3 => "Failed to upload Javascript to server",
 			 5 => isset( $_GET['revision'] ) ? sprintf( __( 'Global Javascript restored to revision from %s, <em>Save Changes for the revision to take effect</em>'), wp_post_revision_title( (int) $_GET['revision'], false ) ) : false
 			 );
