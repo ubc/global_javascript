@@ -39,6 +39,7 @@ class Global_Javascript {
 	public $js_min_file_name_prefix;
 	public $js_min_file_name;
 	public $path_to_js;
+	public $url_to_js;
 		
 	/***************
 	 * Constructor *
@@ -49,11 +50,12 @@ class Global_Javascript {
 		$this->file = plugin_basename( __FILE__ );
 		
 		$this->js_file_name 				= 'global-javascript.js';
-		$this->js_min_file_name_prefix 	= '-global-javascript.min.js';
+		$this->js_min_file_name_prefix 		= '-global-javascript.min.js';
 		
 		$wp_upload_dir = wp_upload_dir();
 		
-		$this->path_to_js = trailingslashit( $wp_upload_dir['basedir'] )."global-js/";
+		$this->path_to_js = trailingslashit( $wp_upload_dir['basedir'] ). "global-js/";
+		$this->url_to_js = trailingslashit( $wp_upload_dir['baseurl'] ) . "global-js/";
 
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
@@ -69,13 +71,32 @@ class Global_Javascript {
 	function register_scripts(){
 		if( !is_admin() ) {
 			$url = $this->get_global_js_url();
+			$dependencies = array();
+			if( false !== ( $post_id = $this->get_plugin_post_id() ) ):
+				$dependencies = $this->get_saved_dependencies( $post_id );
+				$this->load_dependencies( $dependencies );
+			endif;
 			wp_register_script( 'add-global-javascript', $url, $dependencies, '1.0', true );
 			}
 	}
 	
-	function print_scripts(){
-		
-		wp_enqueue_script( 'add-global-javascript' );
+	function print_scripts(){ wp_enqueue_script( 'add-global-javascript' ); }
+
+	function load_dependencies( $dependencies ) {
+		$all_deps = $this->get_all_dependencies();
+		foreach( $dependencies as $dependency ) {
+			if( isset( $all_deps[$dependency]['url'] ) ) {
+				wp_register_script( 
+						$dependency,
+						plugins_url( trailingslashit( $this->path ) . $all_deps[$dependency]['url'] ),
+						array(),
+						'1.0',
+						!$all_deps[$dependency]['load_in_head']
+					);
+				if( $all_deps[$dependency]['load_in_head'] )
+					wp_enqueue_script( $dependency );
+			}
+		}
 	}
 	
 	public function add_menu() {
@@ -273,16 +294,15 @@ class Global_Javascript {
 	public function get_plugin_post_id() {
 		if( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ) ):
 			$post_row = get_object_vars( $a );
-			$post_id = $post_row['ID'];
+			return $post_row['ID'];
 		else:
-			$post_id = false;
+			return false;
 		endif;
-		return $post_id;
 	}
 	
 	public function get_global_js_url(){
 		if( $a = get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ):
-			return  $this->path_to_js. $a[0]->post_excerpt;
+			return  $this->url_to_js . $a[0]->post_excerpt;
 		else:
 			return false;
 		endif;
@@ -398,7 +418,7 @@ class Global_Javascript {
 		'thickbox' => array(
 			'name' => 'Thickbox',
 			'load_in_head' => false,
-			'infourl' => 'http://www.thickbox.net'
+			'infourl' => 'http://codex.wordpress.org/ThickBox'
 		),
 		'underscore' => array(
 			'name'=> 'Underscore js',
