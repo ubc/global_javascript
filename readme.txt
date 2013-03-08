@@ -3,13 +3,18 @@
 Contributors: psmagicman (Julien Law), ctlt-dev, ubcdev
 Donate link:
 Tags: plugin, javascript, editor, ubc, appearance, global, js, dynamic
-Requires at least: 3.5
+Requires at least: WordPress 3.5 and PHP 5.2.1
 Tested up to: 3.5
 Stable tag:
 License: GNU General Public License
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
 A simple Javascript writing/editing tool
+
+=== Acknowledgements ===
+
+This plugin uses the minify library package by Steve Clay (steve@mrclay.org) and Ryan Grove (ryan@wonko.com).
+More info at http://code.google.com/p/minify/
 
 === Description ===
 
@@ -24,8 +29,19 @@ The Javascript made by the user of the plugin will be loaded after any other Jav
 4. Click on the link titled 'Custom JS'
 
 === Changelog ===
-v0.14 - updated the javscript enqueuing method to use the WordPress enqueue instead of script tags
-      - the external javascript files are now loaded at the footer instead of the header
+v.1.0 - release version
+
+v0.16 - dependencies such as jQuery are now included in the plugin
+      - the current libraries can be included by ticking the checkbox in the editor
+      - included a function call to clear cache on save if supercache is enabled
+
+v0.15 - plugin now minifies the javascript using the Google Closure Compiler at simple settings included in the PHP minifier library
+        * Julien's note: if you want to change which minifier to use go to the filter function in the code
+      - changed the way files are saved and loaded to account for the extra time to minify the javascript
+
+v0.14 - plugin no longer does anything on activation and deactivation (not necessary to)
+      - no longer creates a separate directory
+      - changed the way older files are deleted
 
 v0.13 - changed the behavior of the deactivate function. (does not depend on the host being UNIX based)
       - added a recursive function that handles removing directories and the contents inside the directories
