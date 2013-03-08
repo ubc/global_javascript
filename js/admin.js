@@ -25,10 +25,6 @@ jQuery(document).ready(function ($) {
 		
 		$('#global-javascript').val( js );
 		
-		if(js)
-			return true;
-			
-		return false;
 	
 	
 	});

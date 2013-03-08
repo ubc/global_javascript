@@ -34,6 +34,11 @@ class Global_Javascript {
 	public $option = array();
 	
 	public $file;
+	
+	public $js_file_name;
+	public $js_min_file_name_prefix;
+	public $js_min_file_name;
+	public $path_to_js;
 		
 	/***************
 	 * Constructor *
@@ -42,6 +47,13 @@ class Global_Javascript {
 		
 		$this->path = plugin_basename( dirname( __FILE__ ) );
 		$this->file = plugin_basename( __FILE__ );
+		
+		$this->js_file_name 				= 'global-javascript.js';
+		$this->js_min_file_name_prefix 	= '-global-javascript.min.js';
+		
+		$wp_upload_dir = wp_upload_dir();
+		
+		$this->path_to_js = trailingslashit( $wp_upload_dir['basedir'] )."global-js/";
 
 		add_action( 'init', array( $this, 'register_scripts' ) );
 		add_action( 'wp_footer', array( $this,  'print_scripts' ) );
@@ -56,40 +68,9 @@ class Global_Javascript {
 	
 	function register_scripts(){
 		if( !is_admin() ) {
-			$global_javascript_upload_dir = wp_upload_dir();
-			$gj_temp_link = trailingslashit( $global_javascript_upload_dir['basedir'] );
-			if( file_exists( $gj_temp_link . '/global-javascript-actual.js' ) ):
-				$post_id = $this->get_plugin_post_id();
-			// grab the list of dependencies from the db here
-				$all_deps = $this->get_all_dependencies();
-			if( $post_id ):
-				$dependencies = $this->get_saved_dependencies( $post_id );
-				foreach($dependencies as $dep):
-					if(isset($all_deps[$dep]['url'] ) ):
-					wp_register_script($dep, 
-					plugins_url(trailingslashit($this->path) . $all_deps[$dep]['url']), 
-					array(), 
-					'1.0', 
-					!$all_deps[$dep]['load_in_head']);
-						if($all_deps[$dep]['load_in_head']):
-							wp_enqueue_script( $dep);
-						endif;	
-					endif;
-				endforeach;
-			else:
-				$dependencies = array();
-			endif;
-				
-				$global_javascript_minified_time = filemtime( $gj_temp_link . '/global-javascript-actual.js' );
-				$global_javascript_minified_file = trailingslashit( $global_javascript_upload_dir['baseurl'] ) . filemtime( $gj_temp_link . '/global-javascript-actual.js' ) . '-global-javascript.min.js';
-				$global_javascript_actual_file =  trailingslashit( $global_javascript_upload_dir['baseurl'] ) . 'global-javascript-actual.js';
-				if( WP_DEBUG == false ):
-					wp_register_script( 'add-global-javascript', $global_javascript_minified_file, $dependencies, '1.0', true );
-				else:
-					wp_register_script( 'add-global-javascript', $global_javascript_actual_file, $dependencies, '1.0', true );
-				endif;
-			endif;
-		}
+			$url = $this->get_global_js_url();
+			wp_register_script( 'add-global-javascript', $url, $dependencies, '1.0', true );
+			}
 	}
 	
 	function print_scripts(){
@@ -171,7 +152,9 @@ class Global_Javascript {
 	 * @return void
 	 */
 	public function save_revision( $js ) {
-	
+		
+		$this->js_min_file_name = time().$this->js_min_file_name_prefix;
+		
 		// If null, there was no original safejs record, so create one
 		if ( !$safejs_post = $this->get_js() ) {
 			$post = array();
@@ -179,6 +162,7 @@ class Global_Javascript {
 			$post['post_title']   = 'Global Javascript Editor';
 			$post['post_status']  = 'publish';
 			$post['post_type']    = 's-global-javascript';
+			$post['post_excerpt'] = $this->js_min_file_name;
 			
 			$post_id = wp_insert_post( $post );
 			
@@ -186,6 +170,8 @@ class Global_Javascript {
 		} // there is a javascript store in the custom post type
 		
 		$safejs_post['post_content'] = $js;
+		$safejs_post['post_excerpt'] = $this->js_min_file_name;
+		
 
 		wp_update_post( $safejs_post );
 		return $safejs_post['ID'];
@@ -203,39 +189,65 @@ class Global_Javascript {
 	 * @access private
 	 * @return void
 	 */
-	private function save_to_external_file( $js_to_save ) {
-		// lets minify the javascript to save first to solve timing issues
-		$minified_global_js = $this->filter( $js_to_save );
-		WP_Filesystem();
+	private function save_to_external_file( $js ) {
 		
-		$global_js_upload_directory = wp_upload_dir();
+			
 		
-		// do some uploads directory stuff
-		$global_js_temp_directory = $global_js_upload_directory['basedir'];
-		$global_js_filename = trailingslashit( $global_js_temp_directory ) . 'global-javascript-actual.js';
-		$global_js_minified_file = trailingslashit( $global_js_temp_directory ) . time() . '-global-javascript.min.js';
 		
-		//global $wp_filesystem;
-		if ( !file_put_contents( $global_js_filename, $js_to_save ) || !file_put_contents( $global_js_minified_file, $minified_global_js ) ):
-			 return 1;  // return an error upon failure
-		else:
-			if( $global_js_handle = opendir( trailingslashit( $global_js_upload_directory['basedir'] ) ) ):
-				$global_js_newest_filetime = filemtime( $global_js_filename );
-				while( false !== ( $global_js_files = readdir( $global_js_handle ) ) ):
-					$global_js_filelastcreated = filemtime( $global_js_temp_directory . '/' . $global_js_files );
-					if( $global_js_filelastcreated < $global_js_newest_filetime && preg_match( '/-global-javascript.min.js/i', $global_js_files ) ): 
-						// comparing the unix timestamp of the files inside the folder and only deleting the ones that are old and have the specific naming structure
-						unlink( $global_js_temp_directory . '/' . $global_js_files );
-						// clear super cache
-						if( function_exists( 'wp_cache_clear_cache' ) ):
-							wp_cache_clear_cache();
-						endif;
-					endif;
-				endwhile;
-				closedir( $global_js_handle );
-			endif;
+		if( !wp_mkdir_p( $this->path_to_js ) ) 
+			return 1; // we can't make the folder 
+		
+		
+		if( empty( $js ) ):
+			$this->unlink_files( true );
 			return 0;
 		endif;
+		// lets minify the javascript to save first to solve timing issues
+		$js_min = $this->filter( $js );
+		
+		$js_file_path =  $this->path_to_js . $this->js_file_name;
+		$js_minified_file_path = $this->path_to_js . $this->js_min_file_name;
+		
+		// if files saved proccess to the else statment
+		if ( !file_put_contents( $js_file_path, $js ) || !file_put_contents( $js_minified_file_path, $js_min ) ):
+			 return 1;  // return an error upon failure
+		else:
+			// we created the new files 
+			// lets clear some cache
+			if( function_exists( 'wp_cache_clear_cache' ) ):
+				wp_cache_clear_cache();
+			endif;			
+			// lets delete the old minified files
+			$this->unlink_files(  );
+			
+			
+			return 0;
+			
+			
+		endif;
+	}
+	
+	function unlink_files( $all = false){
+		
+		if( $directory_handle = opendir(  $this->path_to_js ) ):
+				
+				while( false !== ( $js_file_handle = readdir( $directory_handle ) ) ):
+					
+					if( $all )
+						$new_files = array( '.', '..' );
+					else
+						$new_files = array( $this->js_min_file_name, $this->js_file_name, '.', '..' );
+				
+					if( !in_array( $js_file_handle, $new_files )   ): 
+						
+						unlink(  $this->path_to_js . '/' .$js_file_handle );
+						
+					endif;
+					
+				endwhile;
+				
+				closedir( $directory_handle );
+			endif;		
 	}
 	
 	/**
@@ -266,6 +278,14 @@ class Global_Javascript {
 			$post_id = false;
 		endif;
 		return $post_id;
+	}
+	
+	public function get_global_js_url(){
+		if( $a = get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ):
+			return  $this->path_to_js. $a[0]->post_excerpt;
+		else:
+			return false;
+		endif;
 	}
 	 
 	
