@@ -323,7 +323,7 @@ class Global_Javascript {
 		
 			<div id="icon-themes" class="icon32"></div>
 			<h2>Global Javascript Editor</h2>
-			
+
 			<form action="themes.php?page=<?php echo  $this->file; ?>" method="post" id="global-javascript-form" >
 				<?php wp_nonce_field( 'update_global_js_js','update_global_js_js_field' ); ?>
 				<div class="metabox-holder has-right-sidebar">
@@ -344,11 +344,25 @@ class Global_Javascript {
 								<?php endforeach; ?>
 							</div>
 						</div>
+						<div class="postbox">
+							<h3><span>Find and Replace With</span></h3>
+							<div class="inside">
+								<?php if($_GET['code'] != "none"):?>
+									<input type="text" style="width:14em;" id="query" value="">
+									<input type="button" value="Find" class="button">
+									<input type="text" style="width:14em;" id="replace" value="">
+									<input type="button" class="button" value="Replace">
+								<?php endif; ?>
+							</div>
+						</div>
 						<!-- ... more boxes ... -->
 						<?php do_meta_boxes( 's-global-javascript', 'normal', $js ); ?>
 						
 					</div> <!-- .inner-sidebar -->
-			
+					<h3 class="nav-tab-wrapper">
+						<a class="nav-tab">File Manager</a>
+						<a class="nav-tab">Editor</a>
+					</h3>
 					<div id="post-body">
 						<div id="post-body-content">
 							<div id="global-editor-shell">
