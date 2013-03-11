@@ -5,7 +5,7 @@ Donate link:
 Tags: plugin, javascript, editor, ubc, appearance, global, js, dynamic
 Requires at least: WordPress 3.5 and PHP 5.2.1
 Tested up to: 3.5
-Stable tag:
+Stable tag: 1.0
 License: GNU General Public License
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
