@@ -1,34 +1,63 @@
 === Global Javascript ===
 
-Contributors: psmagicman (Julien Law), ctlt-dev, ubcdev
+Contributors: psmagicman, ctlt-dev, ubcdev, enej
 Donate link:
 Tags: plugin, javascript, editor, ubc, appearance, global, js, dynamic
 Requires at least: WordPress 3.5 and PHP 5.2.1
 Tested up to: 3.5
-Stable tag:
+Stable tag: 1.0
 License: GNU General Public License
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-A simple Javascript writing/editing tool
+A simple Javascript writing/editing tool using ACE editor and the Minify library
 
-=== Acknowledgements ===
 
-This plugin uses the minify library package by Steve Clay (steve@mrclay.org) and Ryan Grove (ryan@wonko.com).
-More info at http://code.google.com/p/minify/
-
-=== Description ===
+== Description ==
 
 Allows the user to create custom javascript for their Wordpress powered site on a global level.
 The Javascript made by the user of the plugin will be loaded after any other Javascript that is used by other plugins and/or themes.
 
-=== Installation ===
+== Installation ==
 
 1. Upload 'global-javascript' folder to the '/wp_content/plugins' directory. Or alternatively install through the WordPress admin dashboard.
 2. Activate the plugin through the 'Plugins' menu in the WordPress admin dashboard.
 3. Navigate to the 'Appearance' tab in the WordPress admin dashboard sidebar.
-4. Click on the link titled 'Custom JS'
+4. Click on the link titled 'Global Javascript'
 
-=== Changelog ===
+== Frequently Asked Questions ==
+
+= What does the plugin do? =
+
+The plugin is just a simple Javascript writing/editing tool that allows the user to create some custom Javascript to their WordPress powered website.
+
+= How much experience do I need to use this plugin? =
+
+Javascript is not too difficult to pick up. There are many freely available resources online that you can find to help you get started. The site that I used to get started on Javascript is http://w3schools.com/js/default.asp
+
+= Does it do anything to the database? =
+
+Yes. This plugin allows the use of revisions and will add entries to the database in the posts table. The database is accessed using WordPress and PHP core functions and there are no direct SQL queries.
+
+= Does the plugin access the filesystem? =
+
+Yes. This plugin will save and delete files to the filesystem. The files will be located in the uploads folder under the sub-folder "global-js" on a default WordPress installation.
+
+= Does the plugin work in a multisite configuration? =
+
+Yes. The plugin works in a multisite environment as it creates files and folders in the sites own portion of the uploads directory.
+
+== Screenshots ==
+
+1. Screenshot of the editor itself.
+
+2. Screenshot of where to find the editor in the dashboard.
+
+3. Another screenshot of where to find the editor in the dashboard.
+
+4. A screenshot of the minified code.
+
+== Changelog ==
+
 v.1.0 - release version
 
 v0.16 - dependencies such as jQuery are now included in the plugin
@@ -100,3 +129,8 @@ v0.3 -  beautified the codemirror javascript mode code
 v0.2 -  changed code to edit javascript instead of css
 
 v0.1 -  core code created from the improved simpler css plugin by CTLT
+
+== Acknowledgements ==
+
+This plugin uses the minify library package by Steve Clay (steve@mrclay.org) and Ryan Grove (ryan@wonko.com).
+More info at http://code.google.com/p/minify/
