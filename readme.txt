@@ -17,6 +17,22 @@ A simple Javascript writing/editing tool using ACE editor and the Minify library
 Allows the user to create custom javascript for their Wordpress powered site on a global level.
 The Javascript made by the user of the plugin will be loaded after any other Javascript that is used by other plugins and/or themes.
 
+PLUGIN FEATURES:
+Some of the features that are included in this plugin are:
+ - syntax highlighting
+ - code minification
+ - revisions
+ - grouping blocks of code
+ - including dependencies (libraries such as jQuery and backbone.js)
+ - elegant editor interface courtesy of ACE
+
+FUTURE ADDITIONS:
+Here are some of the things that I will be adding sometime in the future as the plugin grows :) :
+ - ability to choose your minifier of choice from the minify library
+ - ability to load different javascript files for each page/post as decided by the plugin user
+ - ability to save additional javascript files and create tabs to organize the files
+ - a separate button to completely delete the javascript files from the server
+
 == Installation ==
 
 1. Upload 'global-javascript' folder to the '/wp_content/plugins' directory. Or alternatively install through the WordPress admin dashboard.
@@ -44,7 +60,11 @@ Yes. This plugin will save and delete files to the filesystem. The files will be
 
 = Does the plugin work in a multisite configuration? =
 
-Yes. The plugin works in a multisite environment as it creates files and folders in the sites own portion of the uploads directory.
+Yes. The plugin works in a multisite environment as it creates files and folders in the site's own portion of the uploads directory.
+
+= How do I get rid of the javascript files from the server? =
+
+At the moment, the only way to do this is to save a blank javascript file. This will delete all the relevant files from your uploads folder. There is currently no way to delete it from your database posts table through the plugin. You will have to access the database and delete it manually. You can find the posts in the data base by searching for post_title = 'Global JavaScript Editor' in the posts table.
 
 == Screenshots ==
 
