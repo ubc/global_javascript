@@ -2,7 +2,7 @@
 
 Contributors: psmagicman, ctlt-dev, ubcdev, enej
 Donate link:
-Tags: plugin, javascript, editor, ubc, appearance, global, js, dynamic
+Tags: plugin, javascript, editor, ubc, appearance, global, js, dynamic, ACE, minify, code, custom, jquery, backbone, thickbox, modernizr, json, underscore, script, dependency
 Requires at least: WordPress 3.5 and PHP 5.2.1
 Tested up to: 3.5
 Stable tag: 1.0
@@ -15,23 +15,36 @@ A simple Javascript writing/editing tool using ACE editor and the Minify library
 == Description ==
 
 Allows the user to create custom javascript for their Wordpress powered site on a global level.
+
 The Javascript made by the user of the plugin will be loaded after any other Javascript that is used by other plugins and/or themes.
 
 PLUGIN FEATURES:
+
 Some of the features that are included in this plugin are:
- - syntax highlighting
- - code minification
- - revisions
- - grouping blocks of code
- - including dependencies (libraries such as jQuery and backbone.js)
- - elegant editor interface courtesy of ACE
+
+- syntax highlighting
+
+- code minification
+
+- revisions
+
+- grouping blocks of code
+
+- including dependencies (libraries such as jQuery and backbone.js)
+
+- elegant editor interface courtesy of ACE
 
 FUTURE ADDITIONS:
+
 Here are some of the things that I will be adding sometime in the future as the plugin grows :) :
- - ability to choose your minifier of choice from the minify library
- - ability to load different javascript files for each page/post as decided by the plugin user
- - ability to save additional javascript files and create tabs to organize the files
- - a separate button to completely delete the javascript files from the server
+
+- ability to choose your minifier of choice from the minify library
+
+- ability to load different javascript files for each page/post as decided by the plugin user
+
+- ability to save additional javascript files and create tabs to organize the files
+
+- a separate button to completely delete the javascript files from the server
 
 == Installation ==
 
