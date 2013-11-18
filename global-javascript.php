@@ -340,7 +340,7 @@ class Global_Javascript {
 							<h3><span>Dependency</span></h3>
 							<div class="inside">
 								<?php foreach($this->get_all_dependencies() as $dep => $dep_array): ?>
-								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /><a href="<?php echo $dep_array['infourl']; ?>"> <?php echo $dep_array['name']; ?> </a></label><br />
+								<label><input type="checkbox" name="dependency[]" value="<?php echo $dep; ?>" <?php checked( in_array($dep ,$dependency ), true ); ?> /> <?php echo $dep_array['name']; ?></label> <a href="<?php echo $dep_array['infourl']; ?>" target="_blank"> more info </a><br />
 								<?php endforeach; ?>
 							</div>
 						</div>
@@ -388,21 +388,16 @@ class Global_Javascript {
 	 */
 	function get_all_dependencies(){
 		
-		return array( 
-		'backbone' => array(
-			'name' => 'Backbone js',
-			'load_in_head' => false,
-			'infourl' => 'http://backbonejs.com'
-			),
+		return array(
 		'jquery' => array(
 			'name'=> 'jQuery',
 			'load_in_head' => false,
 			'infourl' => 'http://jquery.com'
 			),
-		'jquery-ui-autocomplete' => array(
-			'name' => 'jQuery UI Autocomplete',
+		'backbone' => array(
+			'name' => 'Backbone.js',
 			'load_in_head' => false,
-			'infourl' => 'http://jqueryui.com/autocomplete'
+			'infourl' => 'http://backbonejs.com'
 			),
 		'json2' => array(
 			'name' => 'JSON for JS',
@@ -415,13 +410,8 @@ class Global_Javascript {
 			'url' => 'js/dependencies/modernizer.min.js',
 			'infourl' => 'http://modernizr.com'
 		),
-		'thickbox' => array(
-			'name' => 'Thickbox',
-			'load_in_head' => false,
-			'infourl' => 'http://codex.wordpress.org/ThickBox'
-		),
 		'underscore' => array(
-			'name'=> 'Underscore js',
+			'name'=> 'Underscore.js',
 			'load_in_head' => false,
 			'infourl' => 'http://underscorejs.org'
 			)
