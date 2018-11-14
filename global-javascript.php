@@ -296,7 +296,10 @@ class Global_Javascript {
 	 * @return $post_id
 	 */
 	public function get_plugin_post_id() {
-		if( $a = array_shift( get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) ) ) ):
+
+		$posts = get_posts( array( 'numberposts' => 1, 'post_type' => 's-global-javascript', 'post_status' => 'publish' ) );
+
+		if ( $a = array_shift( $posts ) ) :
 			$post_row = get_object_vars( $a );
 			return $post_row['ID'];
 		else:
